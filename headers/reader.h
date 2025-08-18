@@ -4,5 +4,5 @@
 #include <vector>
 
 
-inline std::vector<std::string> get_assembly_from_file(std::string file);
-inline std::vector<std::string> get_assembly_codes();
+std::vector<std::string> get_assembly_from_file(std::string file);
+std::vector<std::string> get_assembly_from_stdin();

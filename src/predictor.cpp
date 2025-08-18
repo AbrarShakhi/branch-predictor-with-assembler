@@ -47,3 +47,7 @@ Saturated4BitCounter &Saturated4BitCounter::operator--() {
 int Saturated4BitCounter::getCounter() {
 	return counter;
 }
+
+int Saturated4BitCounter::getThreshold() {
+	return threshold;
+}

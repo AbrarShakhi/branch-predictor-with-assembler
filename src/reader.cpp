@@ -21,10 +21,11 @@ std::vector<std::string> get_assembly_from_file(std::string file) {
 	return lines;
 }
 
-std::vector<std::string> get_assembly_codes() {
+std::vector<std::string> get_assembly_from_stdin() {
 	std::vector<std::string> lines;
 	std::string line;
-	std::cout << "Write your assemply code here: " << std::endl;
+	std::cout << "Write your assemply code here: (Enter empty line to finish)"
+	          << std::endl;
 	while (true) {
 		if (!std::getline(std::cin, line) || line.empty()) {
 			break;

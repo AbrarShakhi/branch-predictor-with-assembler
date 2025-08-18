@@ -1,7 +1,11 @@
-#include "../headers/parse_args.h"
+#include "args.h"
 
 #include <iostream>
 #include <string>
+
+void missing_filename_error() {
+	std::cerr << "File name required!" << std::endl;
+}
 
 int parse_args(const int argc, char *argv[]) {
 	for (int i = 0; i < argc; i++) {
@@ -10,7 +14,7 @@ int parse_args(const int argc, char *argv[]) {
 				return i + 1;
 				break;
 			} else {
-				std::cout << "File name required!" << std::endl;
+				missing_filename_error();
 				exit(-1);
 			}
 		}
