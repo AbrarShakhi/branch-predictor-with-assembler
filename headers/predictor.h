@@ -1,24 +1,18 @@
-#pragma once
+#ifndef PREDICTOR_H
+#define PREDICTOR_H
 
+#include "bool.h"
 
-class Predictor {
-public:
-	virtual bool predict() = 0;
-};
-
-
-class Saturated4BitCounter : Predictor {
-private:
+typedef struct Saturated4BitCounter {
 	int counter;
 	int threshold;
+} Predictor;
 
-public:
-	Saturated4BitCounter(int);
-	bool predict() override;
-	bool increment();
-	bool decrement();
-	Saturated4BitCounter &operator++();
-	Saturated4BitCounter &operator--();
-	int getCounter();
-	int getThreshold();
-};
+Predictor predictor_create(int);
+void predictor_distroy(Predictor *predictor);
+bool predictor_predict(const Predictor *predictor);
+void predictor_successful_prediction(Predictor *predictor);
+void predictor_unsuccessful_prediction(Predictor *predictor);
+
+
+#endif

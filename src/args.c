@@ -1,18 +1,19 @@
 #include "args.h"
 
-#include <iostream>
-#include <string>
+#include <stdio.h>
+#include <string.h>
 
 void missing_filename_error() {
-	std::cerr << "File name required!" << std::endl;
+	fprintf(stderr, "File name required!\n");
+	fprintf(stderr, "Use Case:\n");
+	fprintf(stderr, "\t[myprogram] -i [assembly.s]\n");
 }
 
 int parse_args(const int argc, char *argv[]) {
 	for (int i = 0; i < argc; i++) {
-		if (std::string(argv[i]) == "-i") {
+		if (strncmp(argv[i], "-i", 2) == 0) {
 			if (i + 1 < argc) {
 				return i + 1;
-				break;
 			} else {
 				missing_filename_error();
 				exit(-1);

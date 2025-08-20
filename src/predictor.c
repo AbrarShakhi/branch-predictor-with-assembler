@@ -1,0 +1,39 @@
+#include "predictor.h"
+
+#include <malloc.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+Predictor predictor_create(int thresholdValue) {
+	if (thresholdValue <= 0 || thresholdValue >= 15) {
+		fprintf(stderr,
+		        "For saturated 4-bit counter 'thresholdValue' has to be "
+		        "between 1 and 14\n");
+		exit(-1);
+	}
+	Predictor *predictor = (Predictor *)malloc(sizeof(Predictor));
+	predictor->threshold = thresholdValue;
+	predictor->counter = thresholdValue;
+}
+
+void predictor_distroy(Predictor *predictor) {
+	if (predictor) {
+		free(predictor);
+		predictor = NULL;
+	}
+}
+
+bool predictor_predict(const Predictor *predictor) {
+	return (predictor->counter >= predictor->threshold);
+}
+
+void predictor_successful_prediction(Predictor *predictor) {
+	if (predictor->counter < 15) {
+		(predictor->counter)++;
+	}
+}
+void predictor_unsuccessful_prediction(Predictor *predictor) {
+	if (predictor->counter > 0) {
+		(predictor->counter)--;
+	}
+}

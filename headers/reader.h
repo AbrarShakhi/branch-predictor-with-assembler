@@ -1,8 +1,7 @@
-#pragma once
-
-#include <string>
-#include <vector>
+#ifndef READER_H
+#define READER_H
 
 
-std::vector<std::string> get_assembly_from_file(std::string file);
-std::vector<std::string> get_assembly_from_stdin();
+char **read_assembly(const char *file);
+
+#endif
