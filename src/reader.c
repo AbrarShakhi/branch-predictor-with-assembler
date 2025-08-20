@@ -4,6 +4,11 @@
 
 #include "stb_ds.h"
 
+void unable_to_allocate_memory_error(char *variable_name) {
+	fprintf(stderr, "Unable to allocate memory [%s]", variable_name);
+}
+
+
 char *read_line(FILE *stream) {
 	size_t capacity = 128;
 	size_t length = 0;

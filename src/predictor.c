@@ -12,6 +12,10 @@ Predictor *predictor_create(int thresholdValue) {
 		exit(-1);
 	}
 	Predictor *predictor = (Predictor *)malloc(sizeof(Predictor));
+	if (!predictor) {
+		unable_to_allocate_memory_error("assembler");
+		exit(-1);
+	}
 	predictor->threshold = thresholdValue;
 	predictor->counter = thresholdValue;
 	return predictor;
