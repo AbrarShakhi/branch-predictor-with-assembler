@@ -1,13 +1,20 @@
+#include "reader.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "stb_ds.h"
 
+
 void unable_to_allocate_memory_error(char *variable_name) {
 	fprintf(stderr, "Unable to allocate memory [%s]", variable_name);
 }
 
+void free_and_null(void *ptr) {
+	free(ptr);
+	ptr = NULL;
+}
 
 char *read_line(FILE *stream) {
 	size_t capacity = 128;
@@ -25,7 +32,7 @@ char *read_line(FILE *stream) {
 			capacity *= 2;
 			char *tmp = realloc(buffer, capacity);
 			if (!tmp) {
-				free(buffer);
+				free_and_null(buffer);
 				return NULL;
 			}
 			buffer = tmp;
@@ -33,7 +40,7 @@ char *read_line(FILE *stream) {
 	}
 
 	if (c == EOF && length == 0) {
-		free(buffer);
+		free_and_null(buffer);
 		return NULL;
 	}
 
@@ -52,7 +59,7 @@ char **read_assembly(const char *file) {
 	char *line;
 
 	while ((line = read_line(in)) != NULL) {
-		arrput(lines, line);
+		arrpush(lines, line);
 	}
 
 	fclose(in);

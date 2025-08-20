@@ -4,6 +4,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "reader.h"
+
+
 Predictor *predictor_create(int thresholdValue) {
 	if (thresholdValue <= 0 || thresholdValue >= 15) {
 		fprintf(stderr,
@@ -23,8 +26,7 @@ Predictor *predictor_create(int thresholdValue) {
 
 void predictor_distroy(Predictor *predictor) {
 	if (predictor) {
-		free(predictor);
-		predictor = NULL;
+		free_and_null(predictor);
 	}
 }
 

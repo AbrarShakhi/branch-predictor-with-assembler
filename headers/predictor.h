@@ -3,6 +3,7 @@
 
 #include "bool.h"
 
+
 typedef struct Saturated4BitCounter {
 	int counter;
 	int threshold;

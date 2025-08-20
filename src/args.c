@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+
 void missing_filename_error() {
 	fprintf(stderr, "File name required!\n");
 	fprintf(stderr, "Use Case:\n");
