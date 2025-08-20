@@ -7,75 +7,88 @@
 #include "bool.h"
 
 
-bool find_char(char *string, char ch) {
+bool starts_with(char *string, char ch) {
+	if (!strlen(string)) {
+		return false;
+	}
+	return string[0] == ch;
+}
+
+
+bool ends_with(char *string, char ch) {
+	size_t len = strlen(string);
+	if (!len) {
+		return false;
+	}
+	return string[len - 1] == ch;
+}
+
+void remove_trailing_char(char *string, char c) {
+	size_t len = strlen(string);
+	if (len > 0 && string[len - 1] == c) {
+		string[len - 1] = '\0';
+	}
+}
+
+void remove_leading_char(char *str, char ch) {
+	if (!str)
+		return;
+	if (str[0] == ch) {
+		size_t len = strlen(str);
+		memmove(str, str + 1, len);
+	}
+}
+
+
+bool is_line_empty_or_whitespace(const char *string) {
 	while (*string) {
-		if (*string == ch) {
-			return true;
-		}
-		string++;
-	}
-	return false;
-}
-
-void remove_trailing_char(char *token, char c) {
-	size_t len = strlen(token);
-	if (len > 0 && token[len - 1] == c) {
-		token[len - 1] = '\0';
-	}
-}
-
-bool is_line_empty_or_whitespace(const char *line) {
-	while (*line) {
-		if (!isspace((unsigned char)*line)) {
+		if (!isspace((unsigned char)*string)) {
 			return false;
 		}
-		line++;
+		string++;
 	}
 	return true;
 }
 
-#include <ctype.h>
-#include <string.h>
 
-
-void trim_whitespace(char *line) {
+void trim_whitespace(char *string) {
 	char *end;
 
-	while (isspace((unsigned char)*line)) {
-		line++;
+	while (isspace((unsigned char)*string)) {
+		string++;
 	}
-	if (*line == 0) {
-		*line = '\0';
+	if (*string == 0) {
+		*string = '\0';
 		return;
 	}
 
-	end = line + strlen(line) - 1;
-	while (end > line && isspace((unsigned char)*end)) {
+	end = string + strlen(string) - 1;
+	while (end > string && isspace((unsigned char)*end)) {
 		end--;
 	}
 
 	*(end + 1) = '\0';
 }
 
-void trim_whitespace_inplace(char *line) {
-	char *start = line;
+void trim_whitespace_inplace(char *string) {
+	char *start = string;
 	char *end;
 	size_t len;
 
 	while (isspace((unsigned char)*start)) {
 		start++;
 	}
-	if (start != line) {
+	if (start != string) {
 		len = strlen(start);
-		memmove(line, start, len + 1);
+		memmove(string, start, len + 1);
 	}
 
-	len = strlen(line);
+	len = strlen(string);
 	if (len == 0)
 		return;
 
-	end = line + len - 1;
-	while (end >= line && isspace((unsigned char)*end)) {
+	end = string + len - 1;
+	while (end >= string && isspace((unsigned char)*end)) {
 		*end = '\0';
 		end--;
 	}

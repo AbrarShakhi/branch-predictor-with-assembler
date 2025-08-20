@@ -33,6 +33,31 @@ void assembler_parse(Assembler *assembler) {
 	assembler->lines = read_assembly(assembler->file);
 }
 
+char **preprocess(char *line) {
+	if (is_line_empty_or_whitespace(line)) {
+		NULL;
+	}
+	trim_whitespace_inplace(line);
+
+	char **tokens = NULL;
+	char *token = strtok(line, " \t");
+	while (token != NULL) {
+		remove_trailing_char(token, ',');
+		arrpush(tokens, token);
+		token = strtok(NULL, " \t");
+	}
+
+	return tokens;
+}
+
+bool is_label(char **tokens) {
+	int token_len = arrlen(tokens);
+	if (token_len == 1) {
+		return ends_with(tokens[0], ':');
+	}
+	return false;
+}
+
 void assembler_tokenize(Assembler *assembler) {
 	int line_length = arrlen(assembler->lines);
 
@@ -40,31 +65,16 @@ void assembler_tokenize(Assembler *assembler) {
 	for (int i = 0; i < line_length; i++) {
 		char *line = assembler->lines[i];
 
-		if (is_line_empty_or_whitespace(line)) {
+		char **tokens = preprocess(line);
+		if (!tokens) {
 			continue;
 		}
-		trim_whitespace_inplace(line);
 
-
-		char **tokens = NULL;
-		char *token = strtok(line, " \t");
-		while (token != NULL) {
-			remove_trailing_char(token, ',');
-			arrpush(tokens, token);
-			token = strtok(NULL, " \t");
-		}
-		bool is_label = false;
-		int token_len = arrlen(tokens);
-		if (token_len == 1) {
-			if (find_char(tokens[0], ':')) {
-				is_label = true;
-				remove_trailing_char(tokens[0], ':');
-			}
-		}
-
-		if (is_label) {
+		if (is_label(tokens)) {
+			remove_trailing_char(tokens[0], ':');
+			remove_leading_char(tokens[0], '.');
 			shput(assembler->labels, tokens[0], instruction_id);
-		} else {
+		} else if (!starts_with(tokens[0], '.')) {
 			arrpush(assembler->instructions, tokens);
 			instruction_id++;
 		}
