@@ -1,8 +1,8 @@
 #define STB_DS_IMPLEMENTATION
-#define STB_SPRINTF_IMPLEMENTATION
 
 #include "args.h"
 #include "assembler.h"
+#include "cpu.h"
 
 
 int main(int argc, char *argv[]) {
@@ -17,10 +17,14 @@ int main(int argc, char *argv[]) {
 
 	assembler_tokenize(assembler);
 
-	// cpu_create();
+	char ***instructions = assembler->instructions;
+	LabelEntry *labels = assembler->labels;
 
-	// cpu_interpret();
+	Cpu *cpu = cpu_create(instructions, labels);
 
+	cpu_interpret(cpu);
+
+	cpu_destroy(cpu);
 	assembler_destroy(assembler);
 	return 0;
 }

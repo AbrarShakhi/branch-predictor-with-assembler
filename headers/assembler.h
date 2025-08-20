@@ -4,14 +4,16 @@
 #include "stb_ds.h"
 
 
+typedef struct {
+	char *key;
+	int value;
+} LabelEntry;
+
 typedef struct Assembler {
 	char **lines;
 	const char *file;
 	char ***instructions;
-	struct {
-		char *key;
-		int value;
-	} *labels;
+	LabelEntry *labels;
 } Assembler;
 
 
