@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-Predictor predictor_create(int thresholdValue) {
+Predictor *predictor_create(int thresholdValue) {
 	if (thresholdValue <= 0 || thresholdValue >= 15) {
 		fprintf(stderr,
 		        "For saturated 4-bit counter 'thresholdValue' has to be "
@@ -14,6 +14,7 @@ Predictor predictor_create(int thresholdValue) {
 	Predictor *predictor = (Predictor *)malloc(sizeof(Predictor));
 	predictor->threshold = thresholdValue;
 	predictor->counter = thresholdValue;
+	return predictor;
 }
 
 void predictor_distroy(Predictor *predictor) {

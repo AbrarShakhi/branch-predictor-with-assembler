@@ -8,7 +8,7 @@ typedef struct Saturated4BitCounter {
 	int threshold;
 } Predictor;
 
-Predictor predictor_create(int);
+Predictor *predictor_create(int);
 void predictor_distroy(Predictor *predictor);
 bool predictor_predict(const Predictor *predictor);
 void predictor_successful_prediction(Predictor *predictor);
