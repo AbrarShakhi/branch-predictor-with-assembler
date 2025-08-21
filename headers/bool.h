@@ -2,18 +2,22 @@
 #define BOOL_H
 
 #ifdef __cplusplus
-// In C++, bool, true, false are built-in keywords, so no definition needed
+// In C++, these are built-in, no need to define or include anything
+#define bool bool
 #define true true
 #define false false
 #else
-// In C, define bool as _Bool, true as 1, false as 0
+// Check if stdbool.h has already defined bool
+#ifndef __bool_true_false_are_defined
+#include <stdbool.h>
+// If somehow still not defined (on non-conforming systems), fallback
+#else
 typedef _Bool bool;
-#ifndef true
 #define true 1
-#endif
-#ifndef false
 #define false 0
+#define __bool_true_false_are_defined 1
 #endif
+
 #endif
 
 #endif
