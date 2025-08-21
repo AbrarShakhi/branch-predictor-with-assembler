@@ -1,6 +1,5 @@
 #include "cpu.h"
 
-#include <stdio.h>
 #include <stdlib.h>
 
 #include "assembler.h"
@@ -9,22 +8,43 @@
 #include "stb_ds.h"
 
 
+int __operand_len(char **operand) {
+	int i = 0;
+	while (operand[i]) {
+		i++;
+	}
+	return i;
+}
+
+void __cpu__add_func(Cpu *cpu, char **operand) {
+	int operand_len = __operand_len(operand);
+	// if operand_len (number of operand) is 0,
+	//// add using stack
+	// if 1 then ACCUMULATOR = ACCUMULATOR + OPERATOR;
+	// if 2 then OP1 = OP1 + OP2
+	// if 3 then OP1 = OP2 + OP3
+}
+
+void __cpu__mul_func(Cpu *cpu, char **operand) {
+	int operand_len = __operand_len(operand);
+}
+
+
 Cpu *cpu_create() {
-	Cpu *cpu = (Cpu *)malloc(sizeof(Cpu));
+	Cpu *cpu = (Cpu *)calloc(1, sizeof(Cpu));
 	if (!cpu) {
 		unable_to_allocate_memory_error("cpu");
 		exit(-1);
 	}
-	cpu->program_counter = 0;
-	cpu->instruction_register = NULL;
-	cpu->accumulator = 0;
-	cpu->process = NULL;
+	shput(cpu->opcode_funcmap, "ADD", __cpu__add_func);
+	shput(cpu->opcode_funcmap, "MUL", __cpu__mul_func);
+	shput(cpu->opcode_funcmap, "MPY", __cpu__mul_func);
 	return cpu;
 }
 
 void cpu_load_process(Cpu *cpu, char ***instructions, LabelEntry *labels) {
 	cpu->program_counter = 0;
-	cpu->process = (Process *)malloc(sizeof(Process));
+	cpu->process = (Process *)malloc(1 * sizeof(Process));
 	if (!cpu->process) {
 		unable_to_allocate_memory_error("cpu");
 		exit(-1);
@@ -38,13 +58,10 @@ bool __cpu_process_finish(Cpu *cpu) {
 	return (cpu->program_counter >= cpu->process->instruction_len);
 }
 
-void __cpu_execute_instruction(Cpu *cpu) {
-	for (int i = 0; i < arrlen(cpu->instruction_register); i++) {
-		printf("%s ", cpu->instruction_register[i]);
-	}
-	printf("\n");
+int __cpu_execute_instruction(Cpu *cpu) {
+	// if
+	return 0;
 }
-
 
 void cpu_interpret(Cpu *cpu) {
 	while (true) {
@@ -53,7 +70,6 @@ void cpu_interpret(Cpu *cpu) {
 		}
 		cpu->instruction_register =
 		    cpu->process->instructions[cpu->program_counter];
-		(cpu->program_counter)++;
 
 		__cpu_execute_instruction(cpu);
 	}

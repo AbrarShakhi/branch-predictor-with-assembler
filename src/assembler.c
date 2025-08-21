@@ -17,15 +17,12 @@ void unrecognized_assembly_syntax_error(char *line, int line_number) {
 }
 
 Assembler *assembler_create(const char *file) {
-	Assembler *assembler = malloc(sizeof(Assembler));
+	Assembler *assembler = (Assembler *)calloc(1, sizeof(Assembler));
 	if (!assembler) {
 		unable_to_allocate_memory_error("assembler");
 		exit(-1);
 	}
 	assembler->file = file;
-	assembler->lines = NULL;
-	assembler->instructions = NULL;
-	assembler->labels = NULL;
 	return assembler;
 }
 
