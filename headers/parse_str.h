@@ -2,8 +2,7 @@
 #define PARSE_STR_H
 
 #include <ctype.h>
-
-#include "bool.h"
+#include <stdbool.h>
 
 
 bool is_line_empty_or_whitespace(const char *);

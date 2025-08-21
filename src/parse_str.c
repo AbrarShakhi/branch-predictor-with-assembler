@@ -1,10 +1,9 @@
 #include "parse_str.h"
 
 #include <ctype.h>
+#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include "bool.h"
 
 
 bool starts_with(char *string, char ch) {

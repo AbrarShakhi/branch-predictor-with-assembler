@@ -1,7 +1,7 @@
 #ifndef PREDICTOR_H
 #define PREDICTOR_H
 
-#include "bool.h"
+#include <stdbool.h>
 
 
 typedef struct Saturated4BitCounter {

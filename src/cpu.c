@@ -1,9 +1,9 @@
 #include "cpu.h"
 
+#include <stdbool.h>
 #include <stdlib.h>
 
 #include "assembler.h"
-#include "bool.h"
 #include "reader.h"
 #include "stb_ds.h"
 
