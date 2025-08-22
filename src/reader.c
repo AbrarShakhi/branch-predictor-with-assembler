@@ -5,16 +5,8 @@
 #include <string.h>
 
 #include "stb_ds.h"
+#include "utils.h"
 
-
-void unable_to_allocate_memory_error(char *variable_name) {
-	fprintf(stderr, "Unable to allocate memory [%s]", variable_name);
-}
-
-void free_and_null(void *ptr) {
-	free(ptr);
-	ptr = NULL;
-}
 
 char *read_line(FILE *stream) {
 	size_t capacity = 128;
@@ -51,8 +43,7 @@ char *read_line(FILE *stream) {
 char **read_assembly(const char *file) {
 	FILE *in = fopen(file, "r");
 	if (!in) {
-		fprintf(stderr, "Could not open: %s\n", file);
-		exit(-1);
+		could_not_open_file(file);
 	}
 
 	char **lines = NULL;

@@ -17,8 +17,6 @@ typedef struct Assembler {
 } Assembler;
 
 
-void unrecognized_assembly_syntax_error(char *, int);
-
 Assembler *assembler_create(const char *);
 
 void assembler_parse(Assembler *assembler);

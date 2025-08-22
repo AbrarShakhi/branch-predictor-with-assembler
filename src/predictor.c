@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "reader.h"
+#include "utils.h"
 
 
 Predictor *predictor_create(int thresholdValue) {
@@ -17,7 +17,6 @@ Predictor *predictor_create(int thresholdValue) {
 	Predictor *predictor = (Predictor *)malloc(sizeof(Predictor));
 	if (!predictor) {
 		unable_to_allocate_memory_error("assembler");
-		exit(-1);
 	}
 	predictor->threshold = thresholdValue;
 	predictor->counter = thresholdValue;

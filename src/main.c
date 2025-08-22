@@ -7,10 +7,6 @@
 
 int main(int argc, char *argv[]) {
 	char *input_file = parse_args(argc, argv);
-	if (!input_file) {
-		missing_filename_error();
-		exit(-1);
-	}
 
 	Assembler *assembler = assembler_create(input_file);
 	assembler_parse(assembler);
