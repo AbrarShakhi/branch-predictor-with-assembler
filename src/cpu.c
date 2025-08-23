@@ -21,6 +21,18 @@ Cpu *cpu_create() {
 	return cpu;
 }
 
+void cpu_load_process(Cpu *cpu, char ***instructions, LabelEntry *labels) {
+	cpu->program_counter = 0;
+	cpu->process = (Process *)malloc(1 * sizeof(Process));
+	if (!cpu->process) {
+		unable_to_allocate_memory_error("cpu");
+		exit(-1);
+	}
+	cpu->process->instructions = instructions;
+	cpu->process->labels = labels;
+	cpu->process->instruction_len = arrlen(cpu->process->instructions);
+}
+
 bool __cpu_process_finish(Cpu *cpu) {
 	return (cpu->program_counter >= cpu->process->instruction_len);
 }
