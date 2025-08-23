@@ -4,8 +4,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "miscs.h"
 #include "stb_ds.h"
-#include "utils.h"
 
 
 char *read_line(FILE *stream) {

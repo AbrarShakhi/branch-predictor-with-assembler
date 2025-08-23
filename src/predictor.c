@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "utils.h"
+#include "miscs.h"
 
 
 Predictor *predictor_create(int thresholdValue) {
@@ -12,7 +12,7 @@ Predictor *predictor_create(int thresholdValue) {
 		fprintf(stderr,
 		        "For saturated 4-bit counter 'thresholdValue' has to be "
 		        "between 1 and 14\n");
-		exit(-1);
+		shutdown(-1);
 	}
 	Predictor *predictor = (Predictor *)malloc(sizeof(Predictor));
 	if (!predictor) {

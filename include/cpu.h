@@ -39,6 +39,9 @@ typedef struct Cpu {
 	Process *process;
 } Cpu;
 
+OpcodeEntry *map_opcode_logics();
+int operand_len(char **);
+
 Cpu *cpu_create();
 void cpu_load_process(Cpu *, char ***, LabelEntry *);
 void cpu_interpret(Cpu *);

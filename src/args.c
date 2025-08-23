@@ -2,7 +2,7 @@
 
 #include <string.h>
 
-#include "utils.h"
+#include "miscs.h"
 
 
 char *parse_args(const int argc, char *argv[]) {

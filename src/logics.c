@@ -1,20 +1,12 @@
 #include "logics.h"
 
 #include "cpu.h"
+#include "miscs.h"
 #include "stb_ds.h"
-#include "utils.h"
 
-
-int __operand_len(char **operand) {
-	int i = 0;
-	while (operand && operand[i]) {
-		i++;
-	}
-	return i;
-}
 
 void add_func(Cpu *cpu, char **operand) {
-	switch (__operand_len(operand)) {
+	switch (operand_len(operand)) {
 		case 0:
 			if (arrlen(cpu->stack) < 2) {
 				segmentation_fault_error("Stack underflow");
@@ -35,7 +27,7 @@ void add_func(Cpu *cpu, char **operand) {
 }
 
 void mul_func(Cpu *cpu, char **operand) {
-	switch (__operand_len(operand)) {
+	switch (operand_len(operand)) {
 		case 0:
 			if (arrlen(cpu->stack) < 2) {
 				segmentation_fault_error("Stack underflow");
@@ -56,7 +48,7 @@ void mul_func(Cpu *cpu, char **operand) {
 }
 
 void sub_func(Cpu *cpu, char **operand) {
-	switch (__operand_len(operand)) {
+	switch (operand_len(operand)) {
 		case 0:
 			if (arrlen(cpu->stack) < 2) {
 				segmentation_fault_error("Stack underflow");
@@ -77,7 +69,7 @@ void sub_func(Cpu *cpu, char **operand) {
 }
 
 void div_func(Cpu *cpu, char **operand) {
-	switch (__operand_len(operand)) {
+	switch (operand_len(operand)) {
 		case 0:
 			if (arrlen(cpu->stack) < 2) {
 				segmentation_fault_error("Stack underflow");
