@@ -13,7 +13,7 @@ int __operand_len(char **operand) {
 	return i;
 }
 
-void cpu_add_func(Cpu *cpu, char **operand) {
+void add_func(Cpu *cpu, char **operand) {
 	switch (__operand_len(operand)) {
 		case 0:
 			if (arrlen(cpu->stack) < 2) {
@@ -34,7 +34,7 @@ void cpu_add_func(Cpu *cpu, char **operand) {
 	}
 }
 
-void cpu_mul_func(Cpu *cpu, char **operand) {
+void mul_func(Cpu *cpu, char **operand) {
 	switch (__operand_len(operand)) {
 		case 0:
 			if (arrlen(cpu->stack) < 2) {
@@ -55,7 +55,7 @@ void cpu_mul_func(Cpu *cpu, char **operand) {
 	}
 }
 
-void cpu_sub_func(Cpu *cpu, char **operand) {
+void sub_func(Cpu *cpu, char **operand) {
 	switch (__operand_len(operand)) {
 		case 0:
 			if (arrlen(cpu->stack) < 2) {
@@ -76,7 +76,7 @@ void cpu_sub_func(Cpu *cpu, char **operand) {
 	}
 }
 
-void cpu_div_func(Cpu *cpu, char **operand) {
+void div_func(Cpu *cpu, char **operand) {
 	switch (__operand_len(operand)) {
 		case 0:
 			if (arrlen(cpu->stack) < 2) {
