@@ -55,6 +55,7 @@ void assembler_tokenize(Assembler *assembler) {
 	int instruction_id = 0;
 	for (int i = 0; i < line_length; i++) {
 		char *line = assembler->lines[i];
+		to_upper(&line);
 
 		char **tokens = preprocess(line);
 		if (!tokens) {

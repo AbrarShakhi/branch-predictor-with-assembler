@@ -1,11 +1,12 @@
 #include "cpu.h"
 
 #include <stdbool.h>
-#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "logics.h"
 #include "miscs.h"
+#include "parse_str.h"
 #include "stb_ds.h"
 
 
@@ -13,31 +14,18 @@ OpcodeEntry *map_opcode_logics() {
 	OpcodeEntry *opcode_funcmap = NULL;
 	shdefault(opcode_funcmap, NULL);
 
-	// shput(opcode_funcmap, "NOP", nop_func);
-	shput(opcode_funcmap, "ADD", add_func);
-	shput(opcode_funcmap, "SUB", sub_func);
-	shput(opcode_funcmap, "MUL", mul_func);
-	shput(opcode_funcmap, "DIV", div_func);
-	// shput(opcode_funcmap, "AND", and_func);
-	// shput(opcode_funcmap, "OR", or_func);
-	// shput(opcode_funcmap, "XOR", xor_func);
-	// shput(opcode_funcmap, "STOR", str_func);
-	// shput(opcode_funcmap, "MOV", mov_func);
-	// shput(opcode_funcmap, "PUSH", push_func);
-	// shput(opcode_funcmap, "POP", pop_func);
-	// shput(opcode_funcmap, "RET", ret_func);
+	shput(opcode_funcmap, "NOP", NULL);
+	shput(opcode_funcmap, "ADD", add_func); // DONE
+	shput(opcode_funcmap, "SUB", sub_func); // DONE
+	shput(opcode_funcmap, "MUL", mul_func); // DONE
+	shput(opcode_funcmap, "DIV", div_func); // DONE
+	// shput(opcode_funcmap, "STOR", stor_func);
+	// shput(opcode_funcmap, "LOAD", load_func);
+	shput(opcode_funcmap, "PUSH", push_func); // DONE
+	shput(opcode_funcmap, "POP", pop_func);   // DONE
 	// shput(opcode_funcmap, "JMP", JMP_func);
 
 	return opcode_funcmap;
-}
-
-char **__create_operand(char **tokens, int token_len) {
-	char **operand = NULL;
-	for (int i = 1; i < token_len; i++) {
-		arrpush(operand, tokens[i]);
-	}
-	arrpush(operand, NULL);
-	return operand;
 }
 
 int operand_len(char **operand) {
@@ -58,8 +46,48 @@ Cpu *cpu_create() {
 	return cpu;
 }
 
+int cpu_get_value_from_mem_or_reg(Cpu *cpu, char *operand) {
+	if (is_digits_only(operand)) {
+		return atoi(operand);
+	}
+	if (strncmp(operand, "AC", 2)) {
+		return cpu->ac;
+	}
+
+	if (surrounded_by_braces(operand, '(')) {
+		remove_leading_char(operand, '(');
+		remove_trailing_char(operand, ')');
+		trim_whitespace_inplace(operand);
+	}
+	MemoryEntry *mem = shgetp_null(cpu->memory, operand);
+	if (!mem) {
+		segmentation_fault_error("Memory access violation: address not found");
+	}
+	return atoi(mem->value);
+}
+
+void cpu_set_value_to_mem_or_reg(Cpu *cpu, char *operand, int value) {
+	if (strncmp(operand, "AC", 2)) {
+		cpu->ac = value;
+		return;
+	}
+
+	if (surrounded_by_braces(operand, '(')) {
+		remove_leading_char(operand, '(');
+		remove_trailing_char(operand, ')');
+		trim_whitespace_inplace(operand);
+	}
+	MemoryEntry *mem = shgetp_null(cpu->memory, operand);
+	if (!mem) {
+		shput(cpu->memory, operand, itoa_dynamic(value));
+		return;
+	}
+	free_and_null(mem->value);
+	mem->value = itoa_dynamic(value);
+}
+
 void cpu_load_process(Cpu *cpu, char ***instructions, LabelEntry *labels) {
-	cpu->program_counter = 0;
+	cpu->pc = 0;
 	cpu->process = (Process *)malloc(1 * sizeof(Process));
 	if (!cpu->process) {
 		unable_to_allocate_memory_error("cpu");
@@ -70,41 +98,65 @@ void cpu_load_process(Cpu *cpu, char ***instructions, LabelEntry *labels) {
 }
 
 bool __cpu_process_finish(Cpu *cpu) {
-	return (cpu->program_counter >= cpu->process->instruction_len);
+	return (cpu->pc >= cpu->process->instruction_len);
 }
 
-int __cpu_execute_instruction(Cpu *cpu) {
-	int token_len = arrlen(cpu->instruction_register);
+void __cpu_fetch_instruction(Cpu *cpu) {
+	cpu->mar = cpu->pc;
+	(cpu->pc)++;
+	cpu->ir = cpu->process->instructions[cpu->mar];
+}
+
+OpcodeEntry *__cpu_decode_instruction(Cpu *cpu) {
+	char *opcode = cpu->ir[0];
+	OpcodeEntry *opcode_map = shgetp_null(cpu->opcode_funcmap, opcode);
+	if (!opcode_map) {
+		invalid_instruction_error(cpu->ir);
+	}
+	return opcode_map;
+}
+
+
+char **__cpu_fetch_operand(Cpu *cpu) {
+	int token_len = arrlen(cpu->ir);
 	if (!token_len) {
-		invalid_instruction_error(cpu->instruction_register);
+		invalid_instruction_error(cpu->ir);
 	}
-
-	char *opcode = cpu->instruction_register[0];
-	OpcodeEntry *fnptr = shgetp_null(cpu->opcode_funcmap, opcode);
-	if (!fnptr) {
-		not_implemented_error(__FILE_NAME__, __LINE__,
-		                      "__cpu_execute_instruction");
+	char **operand = NULL;
+	for (int i = 1; i < token_len; i++) {
+		arrpush(operand, cpu->ir[i]);
 	}
+	arrpush(operand, NULL);
+	return operand;
+}
 
-	char **operand = __create_operand(cpu->instruction_register, token_len);
-	if (fnptr->value) {
-		(fnptr->value)(cpu, operand);
+int __cpu_execute_instruction(Cpu *cpu, OpcodeEntry *opcode_map,
+                              char **operand) {
+	if (opcode_map->value) {
+		(opcode_map->value)(cpu, operand);
 	}
-
-	arrfree(operand);
 	return 0;
 }
 
 void cpu_interpret(Cpu *cpu) {
-	while (true) {
-		if (__cpu_process_finish(cpu)) {
-			break;
-		}
-		cpu->instruction_register =
-		    cpu->process->instructions[cpu->program_counter];
+	OpcodeEntry *opcode;
+	char **operand;
+	while (!__cpu_process_finish(cpu)) {
 
-		__cpu_execute_instruction(cpu);
+		__cpu_fetch_instruction(cpu);
+
+		opcode = __cpu_decode_instruction(cpu);
+
+		operand = __cpu_fetch_operand(cpu);
+
+		__cpu_execute_instruction(cpu, opcode, operand);
+
+		arrfree(operand);
 	}
+}
+
+void cpu_print_accumulator_value(const Cpu *cpu, FILE *out_stream) {
+	fprintf(out_stream, "ACCUMULATOR VALUE: [%d]\n", cpu->ac);
 }
 
 void cpu_destroy(Cpu *cpu) {

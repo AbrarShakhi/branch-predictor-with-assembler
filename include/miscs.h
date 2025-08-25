@@ -1,6 +1,7 @@
 #ifndef UTILS_H
 #define UTILS_H
 
+void clean_up();
 void shutdown(int);
 void missing_filename_error();
 void free_and_null(void *ptr);

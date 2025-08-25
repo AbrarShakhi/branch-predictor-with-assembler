@@ -1,6 +1,7 @@
 #ifndef CPU_H
 #define CPU_H
 
+#include <stdio.h>
 #include "assembler.h"
 
 
@@ -19,32 +20,31 @@ typedef struct Process {
 
 typedef struct {
 	char *key;
-	int *value;
-} RegisterEntry;
-
-typedef struct {
-	char *key;
-	int *value;
+	char *value;
 } MemoryEntry;
 
 
 typedef struct Cpu {
-	int program_counter;
-	char **instruction_register;
-	int accumulator;
+	int pc;
+	int mar;
+	char **ir;
+	int ac;
 	OpcodeEntry *opcode_funcmap;
 	int *stack;
-	RegisterEntry *registers;
 	MemoryEntry *memory;
 	Process *process;
 } Cpu;
+
 
 OpcodeEntry *map_opcode_logics();
 int operand_len(char **);
 
 Cpu *cpu_create();
+int cpu_get_value_from_mem_or_reg(Cpu *, char *);
+void cpu_set_value_to_mem_or_reg(Cpu *, char *, int);
 void cpu_load_process(Cpu *, char ***, LabelEntry *);
 void cpu_interpret(Cpu *);
+void cpu_print_accumulator_value(const Cpu *,FILE *);
 void cpu_destroy(Cpu *);
 
 #endif

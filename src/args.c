@@ -15,5 +15,5 @@ char *parse_args(const int argc, char *argv[]) {
 			}
 		}
 	}
-	return NULL;
+	return "/home/abrarshakhi/Desktop/branch-predictor-with-assembler/example/ifelse.s";
 }

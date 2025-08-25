@@ -8,13 +8,16 @@
 #include "stb_ds.h"
 
 
-void shutdown(int status) {
+void clean_up() {
 	extern Cpu *cpu;
 	extern Assembler *assembler;
 
 	cpu_destroy(cpu);
 	assembler_destroy(assembler);
+}
 
+void shutdown(int status) {
+	clean_up();
 	exit(status);
 }
 
