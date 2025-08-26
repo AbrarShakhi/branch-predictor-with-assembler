@@ -24,6 +24,7 @@ int main(int argc, char *argv[]) {
 	cpu_load_process(cpu, assembler->instructions, assembler->labels);
 	cpu_interpret(cpu);
 
+	cpu_print_auc(cpu);
 	clean_up();
 	return 0;
 }

@@ -8,7 +8,7 @@ AlignTrailingComments: true
 # AllowAllParametersOfDeclarationOnNextLine: false
 # AllowShortBlocksOnASingleLine             : true
 AllowShortFunctionsOnASingleLine: false
-AllowShortIfStatementsOnASingleLine: false
+AllowShortIfStatementsOnASingleLine: true
 AllowShortLoopsOnASingleLine: false
 # BinPackParameters                         : false
 # BreakBeforeBraces                         : Allman

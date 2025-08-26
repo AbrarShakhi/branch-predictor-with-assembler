@@ -1,12 +1,14 @@
 #include "cpu.h"
 
 #include <stdbool.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "logics.h"
 #include "miscs.h"
 #include "parse_str.h"
+#include "predictor.h"
 #include "stb_ds.h"
 
 
@@ -43,6 +45,7 @@ Cpu *cpu_create() {
 		unable_to_allocate_memory_error("cpu");
 	}
 	cpu->opcode_funcmap = map_opcode_logics();
+	cpu->predictor = predictor_create(8);
 	return cpu;
 }
 
@@ -130,42 +133,75 @@ char **__cpu_fetch_operand(Cpu *cpu) {
 
 int __cpu_execute_instruction(Cpu *cpu, OpcodeEntry *opcode_map,
                               char **operand) {
-	int (*func)(Cpu *, char **) = opcode_map->value;
-	if (func) {
-		return func(cpu, operand);
+	int next_instr = -1;
+	if (opcode_map->value) {
+		next_instr = (opcode_map->value)(cpu, operand);
 	}
-	return -1;
+	arrfree(operand);
+	return next_instr;
 }
 
 void cpu_interpret(Cpu *cpu) {
-	OpcodeEntry *opcode;
-	char **operand;
 	while (!__cpu_process_finish(cpu)) {
 		cpu->mar = cpu->pc;
-		(cpu->pc)++;
+		cpu->pc++;
 		cpu->ir = cpu->process->instructions[cpu->mar];
 
-		// predict;
+		bool predicted_taken = predictor_predict(cpu->predictor, cpu->mar);
 
-		char **instruction = __cpu_fetch_instruction(cpu, pred);
-		opcode = __cpu_decode_instruction(cpu, instruction);
-		operand = __cpu_fetch_operand(cpu);
+		int next_instr = __cpu_execute_instruction(
+		    cpu,
+		    __cpu_decode_instruction(cpu,
+		                             __cpu_fetch_instruction(cpu, cpu->mar)),
+		    __cpu_fetch_operand(cpu));
 
-		// learn;
+		bool actual_taken = (next_instr != -1) && (next_instr != cpu->mar + 1);
 
-		int next_instr = __cpu_execute_instruction(cpu, opcode, operand);
+		if (predicted_taken == actual_taken) {
+			predictor_successful_prediction(cpu->predictor, cpu->mar);
+		} else {
+			predictor_unsuccessful_prediction(cpu->predictor, cpu->mar);
+		}
 
-		arrfree(operand);
+		if (next_instr != -1) {
+			cpu->pc = next_instr;
+		}
 	}
 }
 
+void cpu_print_auc(Cpu *cpu) {
+	printf("accumulator: %d\n", cpu->ac);
+}
+
 void cpu_destroy(Cpu *cpu) {
-	if (!cpu) {
-		return;
+	if (!cpu) return;
+
+	if (cpu->predictor) {
+		predictor_distroy(cpu->predictor);
+		cpu->predictor = NULL;
+	}
+	if (cpu->memory) {
+		for (int i = 0; i < hmlen(cpu->memory); ++i) {
+			if (cpu->memory[i].key) {
+				free_and_null(cpu->memory[i].key);
+			}
+			if (cpu->memory[i].value) {
+				free_and_null(cpu->memory[i].value);
+			}
+		}
+		hmfree(cpu->memory);
+		cpu->memory = NULL;
+	}
+	if (cpu->stack) {
+		arrfree(cpu->stack);
+		cpu->stack = NULL;
 	}
 	if (cpu->process) {
 		free_and_null(cpu->process);
 	}
+	if (cpu->opcode_funcmap) {
+		shfree(cpu->opcode_funcmap);
+		cpu->opcode_funcmap = NULL;
+	}
 	free_and_null(cpu);
-	// free all memory
 }

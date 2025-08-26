@@ -3,3 +3,4 @@ PUSH 3
 ADD
 PUSH 2
 MUL
+POP
