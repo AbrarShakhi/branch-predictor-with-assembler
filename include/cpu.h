@@ -2,6 +2,7 @@
 #define CPU_H
 
 #include <stdio.h>
+
 #include "assembler.h"
 
 
@@ -9,7 +10,7 @@ typedef struct Cpu Cpu;
 
 typedef struct {
 	char *key;
-	void (*value)(Cpu *, char **);
+	int (*value)(Cpu *, char **);
 } OpcodeEntry;
 
 typedef struct Process {
@@ -44,7 +45,6 @@ int cpu_get_value_from_mem_or_reg(Cpu *, char *);
 void cpu_set_value_to_mem_or_reg(Cpu *, char *, int);
 void cpu_load_process(Cpu *, char ***, LabelEntry *);
 void cpu_interpret(Cpu *);
-void cpu_print_accumulator_value(const Cpu *,FILE *);
 void cpu_destroy(Cpu *);
 
 #endif

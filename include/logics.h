@@ -4,11 +4,14 @@
 #include "cpu.h"
 
 
-void add_func(Cpu *cpu, char **operand);
-void mul_func(Cpu *cpu, char **operand);
-void sub_func(Cpu *cpu, char **operand);
-void div_func(Cpu *cpu, char **operand);
+int add_func(Cpu *, char **);
+int mul_func(Cpu *, char **);
+int sub_func(Cpu *, char **);
+int div_func(Cpu *, char **);
 
-void push_func(Cpu *cpu, char **operand);
-void pop_func(Cpu *cpu, char **operand);
+int stor_func(Cpu *, char **);
+int load_func(Cpu *, char **);
+
+int push_func(Cpu *, char **);
+int pop_func(Cpu *, char **);
 #endif

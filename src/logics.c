@@ -5,7 +5,7 @@
 #include "stb_ds.h"
 
 
-void add_func(Cpu *cpu, char **operand) {
+int add_func(Cpu *cpu, char **operand) {
 	int first, second;
 	switch (operand_len(operand)) {
 		case 0:
@@ -33,9 +33,11 @@ void add_func(Cpu *cpu, char **operand) {
 		default:
 			invalid_instruction_error(cpu->ir);
 	}
+
+	return -1;
 }
 
-void mul_func(Cpu *cpu, char **operand) {
+int mul_func(Cpu *cpu, char **operand) {
 	int first, second;
 	switch (operand_len(operand)) {
 		case 0:
@@ -63,9 +65,10 @@ void mul_func(Cpu *cpu, char **operand) {
 		default:
 			invalid_instruction_error(cpu->ir);
 	}
+	return -1;
 }
 
-void sub_func(Cpu *cpu, char **operand) {
+int sub_func(Cpu *cpu, char **operand) {
 	int first, second;
 	switch (operand_len(operand)) {
 		case 0:
@@ -93,9 +96,10 @@ void sub_func(Cpu *cpu, char **operand) {
 		default:
 			invalid_instruction_error(cpu->ir);
 	}
+	return -1;
 }
 
-void div_func(Cpu *cpu, char **operand) {
+int div_func(Cpu *cpu, char **operand) {
 	int first, second;
 	switch (operand_len(operand)) {
 		case 0:
@@ -123,9 +127,10 @@ void div_func(Cpu *cpu, char **operand) {
 		default:
 			invalid_instruction_error(cpu->ir);
 	}
+	return -1;
 }
 
-void push_func(Cpu *cpu, char **operand) {
+int push_func(Cpu *cpu, char **operand) {
 	int value;
 	switch (operand_len(operand)) {
 		case 0:
@@ -141,9 +146,10 @@ void push_func(Cpu *cpu, char **operand) {
 			invalid_instruction_error(cpu->ir);
 	}
 	arrpush(cpu->stack, value);
+	return -1;
 }
 
-void pop_func(Cpu *cpu, char **operand) {
+int pop_func(Cpu *cpu, char **operand) {
 	switch (operand_len(operand)) {
 		case 0:
 			if (arrlen(cpu->stack) < 1) {
@@ -154,4 +160,39 @@ void pop_func(Cpu *cpu, char **operand) {
 		default:
 			invalid_instruction_error(cpu->ir);
 	}
+	return -1;
+}
+
+
+int stor_func(Cpu *cpu, char **operand) {
+	int value;
+	switch (operand_len(operand)) {
+		case 1:
+			cpu_set_value_to_mem_or_reg(cpu, operand[0], (cpu->ac));
+			break;
+		case 2:
+			value = cpu_get_value_from_mem_or_reg(cpu, operand[1]);
+			cpu_set_value_to_mem_or_reg(cpu, operand[0], value);
+			break;
+		default:
+			invalid_instruction_error(cpu->ir);
+	}
+	return -1;
+}
+
+int load_func(Cpu *cpu, char **operand) {
+	int value;
+	switch (operand_len(operand)) {
+		case 1:
+			value = cpu_get_value_from_mem_or_reg(cpu, operand[0]);
+			cpu->ac = value;
+			break;
+		case 2:
+			value = cpu_get_value_from_mem_or_reg(cpu, operand[1]);
+			cpu_set_value_to_mem_or_reg(cpu, operand[0], value);
+			break;
+		default:
+			invalid_instruction_error(cpu->ir);
+	}
+	return -1;
 }

@@ -5,6 +5,7 @@
 #include <stdlib.h>
 
 #include "miscs.h"
+#include "stb_ds.h"
 
 
 Predictor *predictor_create(int thresholdValue) {
@@ -16,30 +17,50 @@ Predictor *predictor_create(int thresholdValue) {
 	}
 	Predictor *predictor = (Predictor *)malloc(sizeof(Predictor));
 	if (!predictor) {
-		unable_to_allocate_memory_error("assembler");
+		unable_to_allocate_memory_error("predictor");
 	}
 	predictor->threshold = thresholdValue;
-	predictor->counter = thresholdValue;
+	predictor->counter_entry = NULL;
 	return predictor;
+}
+
+bool predictor_predict(Predictor *predictor, int instr) {
+	CounterEntry *entry = hmgetp_null((predictor->counter_entry), instr);
+	if (entry && entry->value) {
+		return entry->value->counter >= predictor->threshold;
+	}
+	return false;
+}
+
+void predictor_successful_prediction(Predictor *predictor, int instr) {
+	CounterEntry *entry = hmgetp_null((predictor->counter_entry), instr);
+	if (entry && entry->value) {
+		(entry->value->counter)++;
+	}
+}
+
+void predictor_unsuccessful_prediction(Predictor *predictor, int instr) {
+	CounterEntry *entry = hmgetp_null((predictor->counter_entry), instr);
+	if (entry && entry->value) {
+		(entry->value->counter)--;
+	} else {
+		Saturated4BitCounter *bitCounter =
+		    (Saturated4BitCounter *)malloc(sizeof(Saturated4BitCounter));
+		if (!bitCounter) {
+			unable_to_allocate_memory_error("Saturated4BitCounter");
+		}
+		(bitCounter->counter)--;
+		hmput((predictor->counter_entry), instr, bitCounter);
+	}
 }
 
 void predictor_distroy(Predictor *predictor) {
 	if (predictor) {
+		for (int i = 0; i < hmlen(predictor->counter_entry); ++i) {
+			free_and_null(predictor->counter_entry[i].value);
+		}
+		hmfree(predictor->counter_entry);
+
 		free_and_null(predictor);
-	}
-}
-
-bool predictor_predict(const Predictor *predictor) {
-	return (predictor->counter >= predictor->threshold);
-}
-
-void predictor_successful_prediction(Predictor *predictor) {
-	if (predictor->counter < 15) {
-		(predictor->counter)++;
-	}
-}
-void predictor_unsuccessful_prediction(Predictor *predictor) {
-	if (predictor->counter > 0) {
-		(predictor->counter)--;
 	}
 }

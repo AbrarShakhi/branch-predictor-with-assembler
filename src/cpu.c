@@ -15,14 +15,14 @@ OpcodeEntry *map_opcode_logics() {
 	shdefault(opcode_funcmap, NULL);
 
 	shput(opcode_funcmap, "NOP", NULL);
-	shput(opcode_funcmap, "ADD", add_func); // DONE
-	shput(opcode_funcmap, "SUB", sub_func); // DONE
-	shput(opcode_funcmap, "MUL", mul_func); // DONE
-	shput(opcode_funcmap, "DIV", div_func); // DONE
-	// shput(opcode_funcmap, "STOR", stor_func);
-	// shput(opcode_funcmap, "LOAD", load_func);
-	shput(opcode_funcmap, "PUSH", push_func); // DONE
-	shput(opcode_funcmap, "POP", pop_func);   // DONE
+	shput(opcode_funcmap, "ADD", add_func);
+	shput(opcode_funcmap, "SUB", sub_func);
+	shput(opcode_funcmap, "MUL", mul_func);
+	shput(opcode_funcmap, "DIV", div_func);
+	shput(opcode_funcmap, "STOR", stor_func);
+	shput(opcode_funcmap, "LOAD", load_func);
+	shput(opcode_funcmap, "PUSH", push_func);
+	shput(opcode_funcmap, "POP", pop_func);
 	// shput(opcode_funcmap, "JMP", JMP_func);
 
 	return opcode_funcmap;
@@ -50,7 +50,7 @@ int cpu_get_value_from_mem_or_reg(Cpu *cpu, char *operand) {
 	if (is_digits_only(operand)) {
 		return atoi(operand);
 	}
-	if (strncmp(operand, "AC", 2)) {
+	if (strncmp(operand, "AX", 2)) {
 		return cpu->ac;
 	}
 
@@ -101,17 +101,15 @@ bool __cpu_process_finish(Cpu *cpu) {
 	return (cpu->pc >= cpu->process->instruction_len);
 }
 
-void __cpu_fetch_instruction(Cpu *cpu) {
-	cpu->mar = cpu->pc;
-	(cpu->pc)++;
-	cpu->ir = cpu->process->instructions[cpu->mar];
+char **__cpu_fetch_instruction(Cpu *cpu, int i) {
+	return cpu->process->instructions[i];
 }
 
-OpcodeEntry *__cpu_decode_instruction(Cpu *cpu) {
-	char *opcode = cpu->ir[0];
+OpcodeEntry *__cpu_decode_instruction(Cpu *cpu, char **instruction) {
+	char *opcode = instruction[0];
 	OpcodeEntry *opcode_map = shgetp_null(cpu->opcode_funcmap, opcode);
 	if (!opcode_map) {
-		invalid_instruction_error(cpu->ir);
+		invalid_instruction_error(instruction);
 	}
 	return opcode_map;
 }
@@ -132,31 +130,33 @@ char **__cpu_fetch_operand(Cpu *cpu) {
 
 int __cpu_execute_instruction(Cpu *cpu, OpcodeEntry *opcode_map,
                               char **operand) {
-	if (opcode_map->value) {
-		(opcode_map->value)(cpu, operand);
+	int (*func)(Cpu *, char **) = opcode_map->value;
+	if (func) {
+		return func(cpu, operand);
 	}
-	return 0;
+	return -1;
 }
 
 void cpu_interpret(Cpu *cpu) {
 	OpcodeEntry *opcode;
 	char **operand;
 	while (!__cpu_process_finish(cpu)) {
+		cpu->mar = cpu->pc;
+		(cpu->pc)++;
+		cpu->ir = cpu->process->instructions[cpu->mar];
 
-		__cpu_fetch_instruction(cpu);
+		// predict;
 
-		opcode = __cpu_decode_instruction(cpu);
-
+		char **instruction = __cpu_fetch_instruction(cpu, pred);
+		opcode = __cpu_decode_instruction(cpu, instruction);
 		operand = __cpu_fetch_operand(cpu);
 
-		__cpu_execute_instruction(cpu, opcode, operand);
+		// learn;
+
+		int next_instr = __cpu_execute_instruction(cpu, opcode, operand);
 
 		arrfree(operand);
 	}
-}
-
-void cpu_print_accumulator_value(const Cpu *cpu, FILE *out_stream) {
-	fprintf(out_stream, "ACCUMULATOR VALUE: [%d]\n", cpu->ac);
 }
 
 void cpu_destroy(Cpu *cpu) {
@@ -167,4 +167,5 @@ void cpu_destroy(Cpu *cpu) {
 		free_and_null(cpu->process);
 	}
 	free_and_null(cpu);
+	// free all memory
 }
