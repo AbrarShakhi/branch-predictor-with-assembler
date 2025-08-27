@@ -22,6 +22,6 @@ int main(const int argc, char *argv[]) {
 	cpu_load_process(cpu, assembler->instructions, assembler->labels);
 	cpu_interpret(cpu);
 
-	// clean_up();
+	clean_up();
 	return 0;
 }

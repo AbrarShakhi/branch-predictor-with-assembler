@@ -85,7 +85,7 @@ void assembler_destroy(Assembler *assembler)
 		}
 		arrfree(assembler->instructions);
 	}
-	// if (assembler->file) free_and_null(assembler->file);
+	if (assembler->file) free_and_null(assembler->file);
 	if (assembler->labels) { shfree(assembler->labels); }
 	if (assembler->lines) {
 		for (int i = 0; i < arrlen(assembler->lines); i++) {

@@ -181,21 +181,18 @@ void cpu_destroy(Cpu *cpu)
 		cpu->predictor = NULL;
 	}
 	if (cpu->memory) {
-		for (int i = 0; i < shlen(cpu->memory); ++i) {
-			if (cpu->memory[i].key) { free_and_null(cpu->memory[i].key); }
-			if (cpu->memory[i].value) { free_and_null(cpu->memory[i].value); }
-		}
-		hmfree(cpu->memory);
-		cpu->memory = NULL;
+		// for (int i = 0; i < shlen(cpu->memory); ++i) {
+		// 	if (cpu->memory[i].key) { free_and_null(cpu->memory[i].key); } // // getting an segfault
+		// 	if (cpu->memory[i].value) { free_and_null(cpu->memory[i].value); } // getting an segfault
+		// }
+		shfree(cpu->memory);
 	}
 	if (cpu->stack) {
 		arrfree(cpu->stack);
-		cpu->stack = NULL;
 	}
 	if (cpu->process) { free_and_null(cpu->process); }
 	if (cpu->opcode_funcmap) {
 		shfree(cpu->opcode_funcmap);
-		cpu->opcode_funcmap = NULL;
 	}
 	free_and_null(cpu);
 }
