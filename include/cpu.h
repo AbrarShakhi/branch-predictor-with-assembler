@@ -24,11 +24,19 @@ typedef struct {
   char *value;
 } MemoryEntry;
 
+typedef struct Alu {
+  bool eq;
+  bool cur;
+  bool neg;
+  bool ovrfl;
+} Alu;
+
 typedef struct Cpu {
   int pc;
   int mar;
   char **ir;
   int ac;
+  Alu alu;
   OpcodeEntry *opcode_funcmap;
   int *stack;
   MemoryEntry *memory;

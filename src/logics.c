@@ -197,54 +197,160 @@ int load_func(Cpu *cpu, char **operand)
 
 int jmp_func(Cpu *cpu, char **operand)
 {
-	not_implemented_error(__FILE_NAME__, __LINE__, NULL);
-	return -1;
+	int jump_to = -1;
+	switch (operand_len(operand)) {
+		case 1:
+			jump_to = atoi(operand[0]);
+			if (jump_to > cpu->pc || 0 < jump_to) {
+				segmentation_fault_error("Invalid jump statement");
+			}
+			break;
+		default:
+			invalid_instruction_error(cpu->ir);
+	}
+	return jump_to;
 }
 
 int je_func(Cpu *cpu, char **operand)
 {
-	not_implemented_error(__FILE_NAME__, __LINE__, NULL);
+	int jump_to = -1;
+	switch (operand_len(operand)) {
+		case 1:
+			if (cpu->alu.eq) {
+				jump_to = atoi(operand[0]);
+				if (jump_to > cpu->pc || 0 < jump_to) {
+					segmentation_fault_error("Invalid jump statement");
+				}
+			}
+			break;
+		default:
+			invalid_instruction_error(cpu->ir);
+	}
 	return -1;
 }
 
 int jne_func(Cpu *cpu, char **operand)
 {
-	not_implemented_error(__FILE_NAME__, __LINE__, NULL);
+	int jump_to = -1;
+	switch (operand_len(operand)) {
+		case 1:
+			if (!(cpu->alu.eq)) {
+				jump_to = atoi(operand[0]);
+				if (jump_to > cpu->pc || 0 < jump_to) {
+					segmentation_fault_error("Invalid jump statement");
+				}
+			}
+			break;
+		default:
+			invalid_instruction_error(cpu->ir);
+	}
 	return -1;
 }
 
 int jc_func(Cpu *cpu, char **operand)
 {
-	not_implemented_error(__FILE_NAME__, __LINE__, NULL);
+	int jump_to = -1;
+	switch (operand_len(operand)) {
+		case 1:
+			if (cpu->alu.cur) {
+				jump_to = atoi(operand[0]);
+				if (jump_to > cpu->pc || 0 < jump_to) {
+					segmentation_fault_error("Invalid jump statement");
+				}
+			}
+			break;
+		default:
+			invalid_instruction_error(cpu->ir);
+	}
 	return -1;
 }
 
 int jnc_func(Cpu *cpu, char **operand)
 {
-	not_implemented_error(__FILE_NAME__, __LINE__, NULL);
+	int jump_to = -1;
+	switch (operand_len(operand)) {
+		case 1:
+			if (!(cpu->alu.cur)) {
+				jump_to = atoi(operand[0]);
+				if (jump_to > cpu->pc || 0 < jump_to) {
+					segmentation_fault_error("Invalid jump statement");
+				}
+			}
+			break;
+		default:
+			invalid_instruction_error(cpu->ir);
+	}
 	return -1;
 }
 
 int jl_func(Cpu *cpu, char **operand)
 {
-	not_implemented_error(__FILE_NAME__, __LINE__, NULL);
+	int jump_to = -1;
+	switch (operand_len(operand)) {
+		case 1:
+			if (!(cpu->alu.eq) && (cpu->alu.neg)) {
+				jump_to = atoi(operand[0]);
+				if (jump_to > cpu->pc || 0 < jump_to) {
+					segmentation_fault_error("Invalid jump statement");
+				}
+			}
+			break;
+		default:
+			invalid_instruction_error(cpu->ir);
+	}
 	return -1;
 }
 
 int jle_func(Cpu *cpu, char **operand)
 {
-	not_implemented_error(__FILE_NAME__, __LINE__, NULL);
+	int jump_to = -1;
+	switch (operand_len(operand)) {
+		case 1:
+			if ((cpu->alu.eq) || (cpu->alu.neg)) {
+				jump_to = atoi(operand[0]);
+				if (jump_to > cpu->pc || 0 < jump_to) {
+					segmentation_fault_error("Invalid jump statement");
+				}
+			}
+			break;
+		default:
+			invalid_instruction_error(cpu->ir);
+	}
 	return -1;
 }
 
 int jg_func(Cpu *cpu, char **operand)
 {
-	not_implemented_error(__FILE_NAME__, __LINE__, NULL);
+	int jump_to = -1;
+	switch (operand_len(operand)) {
+		case 1:
+			if (!(cpu->alu.eq) && !(cpu->alu.neg)) {
+				jump_to = atoi(operand[0]);
+				if (jump_to > cpu->pc || 0 < jump_to) {
+					segmentation_fault_error("Invalid jump statement");
+				}
+			}
+			break;
+		default:
+			invalid_instruction_error(cpu->ir);
+	}
 	return -1;
 }
 
 int jge_func(Cpu *cpu, char **operand)
 {
-	not_implemented_error(__FILE_NAME__, __LINE__, NULL);
+	int jump_to = -1;
+	switch (operand_len(operand)) {
+		case 1:
+			if ((cpu->alu.eq) || !(cpu->alu.neg)) {
+				jump_to = atoi(operand[0]);
+				if (jump_to > cpu->pc || 0 < jump_to) {
+					segmentation_fault_error("Invalid jump statement");
+				}
+			}
+			break;
+		default:
+			invalid_instruction_error(cpu->ir);
+	}
 	return -1;
 }
