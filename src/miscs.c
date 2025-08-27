@@ -46,7 +46,7 @@ void unable_to_allocate_memory_error(const char *variable_name)
 
 void free_and_null(void *ptr)
 {
-	free(ptr);
+	if (ptr) { free(ptr); }
 	ptr = NULL;
 }
 

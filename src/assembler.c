@@ -28,10 +28,10 @@ void assembler_parse(Assembler *assembler)
 char **__preprocess(char *line)
 {
 	if (is_line_empty_or_whitespace(line)) { return NULL; }
-	
+
 	char *comment_start = strchr(line, ';');
 	if (comment_start != NULL) { *comment_start = '\0'; }
-	
+
 	if (is_line_empty_or_whitespace(line)) { return NULL; }
 	trim_whitespace_inplace(line);
 
@@ -85,7 +85,7 @@ void assembler_destroy(Assembler *assembler)
 		}
 		arrfree(assembler->instructions);
 	}
-	if (assembler->file) free_and_null(assembler->file);
+	free_and_null(assembler->file);
 	if (assembler->labels) { shfree(assembler->labels); }
 	if (assembler->lines) {
 		for (int i = 0; i < arrlen(assembler->lines); i++) {
