@@ -13,4 +13,15 @@ int load_func(Cpu *, char **);
 
 int push_func(Cpu *, char **);
 int pop_func(Cpu *, char **);
+
+int jmp_func(Cpu*, char**);
+int je_func(Cpu*, char**);
+int jne_func(Cpu*, char**);
+int jc_func(Cpu*, char**);
+int jnc_func(Cpu*, char**);
+int jl_func(Cpu*, char**);
+int jle_func(Cpu*, char**);
+int jg_func(Cpu*, char**);
+int jge_func(Cpu*, char**);
+
 #endif

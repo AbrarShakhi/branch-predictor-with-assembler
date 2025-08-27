@@ -1,5 +1,7 @@
 #include "logics.h"
 
+#include <stdlib.h>
+
 #include "cpu.h"
 #include "miscs.h"
 #include "stb_ds.h"
@@ -190,5 +192,59 @@ int load_func(Cpu *cpu, char **operand)
 		default:
 			invalid_instruction_error(cpu->ir);
 	}
+	return -1;
+}
+
+int jmp_func(Cpu *cpu, char **operand)
+{
+	not_implemented_error(__FILE_NAME__, __LINE__, NULL);
+	return -1;
+}
+
+int je_func(Cpu *cpu, char **operand)
+{
+	not_implemented_error(__FILE_NAME__, __LINE__, NULL);
+	return -1;
+}
+
+int jne_func(Cpu *cpu, char **operand)
+{
+	not_implemented_error(__FILE_NAME__, __LINE__, NULL);
+	return -1;
+}
+
+int jc_func(Cpu *cpu, char **operand)
+{
+	not_implemented_error(__FILE_NAME__, __LINE__, NULL);
+	return -1;
+}
+
+int jnc_func(Cpu *cpu, char **operand)
+{
+	not_implemented_error(__FILE_NAME__, __LINE__, NULL);
+	return -1;
+}
+
+int jl_func(Cpu *cpu, char **operand)
+{
+	not_implemented_error(__FILE_NAME__, __LINE__, NULL);
+	return -1;
+}
+
+int jle_func(Cpu *cpu, char **operand)
+{
+	not_implemented_error(__FILE_NAME__, __LINE__, NULL);
+	return -1;
+}
+
+int jg_func(Cpu *cpu, char **operand)
+{
+	not_implemented_error(__FILE_NAME__, __LINE__, NULL);
+	return -1;
+}
+
+int jge_func(Cpu *cpu, char **operand)
+{
+	not_implemented_error(__FILE_NAME__, __LINE__, NULL);
 	return -1;
 }

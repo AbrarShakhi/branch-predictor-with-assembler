@@ -11,10 +11,9 @@
 #include "predictor.h"
 #include "stb_ds.h"
 
-
-OpcodeEntry* map_opcode_logics()
+OpcodeEntry *map_opcode_logics()
 {
-	OpcodeEntry* opcode_funcmap = NULL;
+	OpcodeEntry *opcode_funcmap = NULL;
 	shdefault(opcode_funcmap, NULL);
 
 	shput(opcode_funcmap, "NOP", NULL);
@@ -26,12 +25,21 @@ OpcodeEntry* map_opcode_logics()
 	shput(opcode_funcmap, "LOAD", load_func);
 	shput(opcode_funcmap, "PUSH", push_func);
 	shput(opcode_funcmap, "POP", pop_func);
-	// shput(opcode_funcmap, "JMP", JMP_func);
+
+	shput(opcode_funcmap, "JMP", jmp_func); // Un-conditional branch
+	shput(opcode_funcmap, "JE", je_func);   // Branch if eluals to
+	shput(opcode_funcmap, "JNE", jne_func); // Branch if not eluals to
+	shput(opcode_funcmap, "JC", jc_func);   // Branch if carry
+	shput(opcode_funcmap, "JNC", jnc_func); // Branch if carry not zero
+	shput(opcode_funcmap, "JL", jl_func);   // Branch if less than
+	shput(opcode_funcmap, "JLE", jle_func); // Branch if less than or eaual
+	shput(opcode_funcmap, "JG", jg_func);   // Branch if greater than
+	shput(opcode_funcmap, "JGE", jge_func); // Branch if greater than or equal
 
 	return opcode_funcmap;
 }
 
-int operand_len(char** operand)
+int operand_len(char **operand)
 {
 	int i = 0;
 	while (operand && operand[i]) {
@@ -40,17 +48,16 @@ int operand_len(char** operand)
 	return i;
 }
 
-
-Cpu* cpu_create()
+Cpu *cpu_create()
 {
-	Cpu* cpu = (Cpu*)calloc(1, sizeof(Cpu));
+	Cpu *cpu = (Cpu *)calloc(1, sizeof(Cpu));
 	if (!cpu) { unable_to_allocate_memory_error("cpu"); }
 	cpu->opcode_funcmap = map_opcode_logics();
 	cpu->predictor = predictor_create(8);
 	return cpu;
 }
 
-int cpu_get_value_from_mem_or_reg(Cpu* cpu, char* operand)
+int cpu_get_value_from_mem_or_reg(Cpu *cpu, char *operand)
 {
 	if (is_digits_only(operand)) { return atoi(operand); }
 	if (strncmp(operand, "AX", 2)) { return cpu->ac; }
@@ -60,12 +67,12 @@ int cpu_get_value_from_mem_or_reg(Cpu* cpu, char* operand)
 		remove_trailing_char(operand, ')');
 		trim_whitespace_inplace(operand);
 	}
-	MemoryEntry* mem = shgetp_null(cpu->memory, operand);
+	MemoryEntry *mem = shgetp_null(cpu->memory, operand);
 	if (!mem) { segmentation_fault_error("Memory access violation: address not found"); }
 	return atoi(mem->value);
 }
 
-void cpu_set_value_to_mem_or_reg(Cpu* cpu, char* operand, int value)
+void cpu_set_value_to_mem_or_reg(Cpu *cpu, char *operand, int value)
 {
 	if (strncmp(operand, "AC", 2)) {
 		cpu->ac = value;
@@ -77,7 +84,7 @@ void cpu_set_value_to_mem_or_reg(Cpu* cpu, char* operand, int value)
 		remove_trailing_char(operand, ')');
 		trim_whitespace_inplace(operand);
 	}
-	MemoryEntry* mem = shgetp_null(cpu->memory, operand);
+	MemoryEntry *mem = shgetp_null(cpu->memory, operand);
 	if (!mem) {
 		shput(cpu->memory, operand, itoa_dynamic(value));
 		return;
@@ -86,40 +93,39 @@ void cpu_set_value_to_mem_or_reg(Cpu* cpu, char* operand, int value)
 	mem->value = itoa_dynamic(value);
 }
 
-void cpu_load_process(Cpu* cpu, char*** instructions, LabelEntry* labels)
+void cpu_load_process(Cpu *cpu, char ***instructions, LabelEntry *labels)
 {
 	cpu->pc = 0;
-	cpu->process = (Process*)malloc(1 * sizeof(Process));
+	cpu->process = (Process *)malloc(1 * sizeof(Process));
 	if (!cpu->process) { unable_to_allocate_memory_error("cpu"); }
 	cpu->process->instructions = instructions;
 	cpu->process->labels = labels;
 	cpu->process->instruction_len = arrlen(cpu->process->instructions);
 }
 
-bool __cpu_process_finish(Cpu* cpu)
+bool __cpu_process_finish(Cpu *cpu)
 {
 	return (cpu->pc >= cpu->process->instruction_len);
 }
 
-char** __cpu_fetch_instruction(Cpu* cpu, int i)
+char **__cpu_fetch_instruction(Cpu *cpu, int i)
 {
 	return cpu->process->instructions[i];
 }
 
-OpcodeEntry* __cpu_decode_instruction(Cpu* cpu, char** instruction)
+OpcodeEntry *__cpu_decode_instruction(Cpu *cpu, char **instruction)
 {
-	char* opcode = instruction[0];
-	OpcodeEntry* opcode_map = shgetp_null(cpu->opcode_funcmap, opcode);
+	char *opcode = instruction[0];
+	OpcodeEntry *opcode_map = shgetp_null(cpu->opcode_funcmap, opcode);
 	if (!opcode_map) { invalid_instruction_error(instruction); }
 	return opcode_map;
 }
 
-
-char** __cpu_fetch_operand(Cpu* cpu)
+char **__cpu_fetch_operand(Cpu *cpu)
 {
 	int token_len = arrlen(cpu->ir);
 	if (!token_len) { invalid_instruction_error(cpu->ir); }
-	char** operand = NULL;
+	char **operand = NULL;
 	for (int i = 1; i < token_len; i++) {
 		arrpush(operand, cpu->ir[i]);
 	}
@@ -127,7 +133,7 @@ char** __cpu_fetch_operand(Cpu* cpu)
 	return operand;
 }
 
-int __cpu_execute_instruction(Cpu* cpu, OpcodeEntry* opcode_map, char** operand)
+int __cpu_execute_instruction(Cpu *cpu, OpcodeEntry *opcode_map, char **operand)
 {
 	int next_instr = -1;
 	if (opcode_map->value) { next_instr = (opcode_map->value)(cpu, operand); }
@@ -135,7 +141,7 @@ int __cpu_execute_instruction(Cpu* cpu, OpcodeEntry* opcode_map, char** operand)
 	return next_instr;
 }
 
-void cpu_interpret(Cpu* cpu)
+void cpu_interpret(Cpu *cpu)
 {
 	while (!__cpu_process_finish(cpu)) {
 		cpu->mar = cpu->pc;
@@ -160,12 +166,12 @@ void cpu_interpret(Cpu* cpu)
 	}
 }
 
-void cpu_print_auc(Cpu* cpu)
+void cpu_print_auc(Cpu *cpu)
 {
 	printf("accumulator: %d\n", cpu->ac);
 }
 
-void cpu_destroy(Cpu* cpu)
+void cpu_destroy(Cpu *cpu)
 {
 	if (!cpu) { return; }
 

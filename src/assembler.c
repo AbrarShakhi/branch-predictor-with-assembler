@@ -16,6 +16,7 @@ Assembler *assembler_create(const char *file)
 	Assembler *assembler = (Assembler *)calloc(1, sizeof(Assembler));
 	if (!assembler) { unable_to_allocate_memory_error("assembler"); }
 	assembler->file = file;
+	shdefault(assembler->labels, -1);
 	return assembler;
 }
 

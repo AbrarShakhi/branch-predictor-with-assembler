@@ -17,10 +17,10 @@ Predictor *predictor_create(int thresholdValue)
 		    "between 1 and 14\n");
 		shutdown(-1);
 	}
-	Predictor *predictor = (Predictor *)malloc(sizeof(Predictor));
+	Predictor *predictor = (Predictor *)calloc(1, sizeof(Predictor));
 	if (!predictor) { unable_to_allocate_memory_error("predictor"); }
 	predictor->threshold = thresholdValue;
-	predictor->counter_entry = NULL;
+	hmdefault(predictor->counter_entry, NULL);
 	return predictor;
 }
 
