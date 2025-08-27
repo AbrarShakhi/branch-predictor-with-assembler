@@ -201,8 +201,10 @@ int jmp_func(Cpu *cpu, char **operand)
 	int jump_to = -1;
 	switch (operand_len(operand)) {
 		case 1:
-			jump_to = atoi(operand[0]);
-			if (jump_to > cpu->pc || 0 < jump_to) {
+			LabelEntry *label_entry = shgetp_null(cpu->process->labels, operand[0]);
+			if (!label_entry) { segmentation_fault_error("Invalid jump statement"); }
+			jump_to = label_entry->value;
+			if (jump_to >= cpu->process->instruction_len || 0 > jump_to) {
 				segmentation_fault_error("Invalid jump statement");
 			}
 			break;
@@ -218,8 +220,11 @@ int je_func(Cpu *cpu, char **operand)
 	switch (operand_len(operand)) {
 		case 1:
 			if (cpu->alu.eq) {
-				jump_to = atoi(operand[0]);
-				if (jump_to > cpu->pc || 0 < jump_to) {
+				LabelEntry *label_entry = shgetp_null(cpu->process->labels, operand[0]);
+				if (!label_entry) { segmentation_fault_error("Invalid jump statement"); }
+				jump_to = label_entry->value;
+
+				if (jump_to >= cpu->process->instruction_len || 0 > jump_to) {
 					segmentation_fault_error("Invalid jump statement");
 				}
 			}
@@ -236,8 +241,11 @@ int jne_func(Cpu *cpu, char **operand)
 	switch (operand_len(operand)) {
 		case 1:
 			if (!(cpu->alu.eq)) {
-				jump_to = atoi(operand[0]);
-				if (jump_to > cpu->pc || 0 < jump_to) {
+				LabelEntry *label_entry = shgetp_null(cpu->process->labels, operand[0]);
+				if (!label_entry) { segmentation_fault_error("Invalid jump statement"); }
+				jump_to = label_entry->value;
+
+				if (jump_to >= cpu->process->instruction_len || 0 > jump_to) {
 					segmentation_fault_error("Invalid jump statement");
 				}
 			}
@@ -254,8 +262,11 @@ int jl_func(Cpu *cpu, char **operand)
 	switch (operand_len(operand)) {
 		case 1:
 			if (!(cpu->alu.eq) && (cpu->alu.neg)) {
-				jump_to = atoi(operand[0]);
-				if (jump_to > cpu->pc || 0 < jump_to) {
+				LabelEntry *label_entry = shgetp_null(cpu->process->labels, operand[0]);
+				if (!label_entry) { segmentation_fault_error("Invalid jump statement"); }
+				jump_to = label_entry->value;
+
+				if (jump_to >= cpu->process->instruction_len || 0 > jump_to) {
 					segmentation_fault_error("Invalid jump statement");
 				}
 			}
@@ -272,8 +283,11 @@ int jle_func(Cpu *cpu, char **operand)
 	switch (operand_len(operand)) {
 		case 1:
 			if ((cpu->alu.eq) || (cpu->alu.neg)) {
-				jump_to = atoi(operand[0]);
-				if (jump_to > cpu->pc || 0 < jump_to) {
+				LabelEntry *label_entry = shgetp_null(cpu->process->labels, operand[0]);
+				if (!label_entry) { segmentation_fault_error("Invalid jump statement"); }
+				jump_to = label_entry->value;
+
+				if (jump_to >= cpu->process->instruction_len || 0 > jump_to) {
 					segmentation_fault_error("Invalid jump statement");
 				}
 			}
@@ -290,8 +304,11 @@ int jg_func(Cpu *cpu, char **operand)
 	switch (operand_len(operand)) {
 		case 1:
 			if (!(cpu->alu.eq) && !(cpu->alu.neg)) {
-				jump_to = atoi(operand[0]);
-				if (jump_to > cpu->pc || 0 < jump_to) {
+				LabelEntry *label_entry = shgetp_null(cpu->process->labels, operand[0]);
+				if (!label_entry) { segmentation_fault_error("Invalid jump statement"); }
+				jump_to = label_entry->value;
+
+				if (jump_to >= cpu->process->instruction_len || 0 > jump_to) {
 					segmentation_fault_error("Invalid jump statement");
 				}
 			}
@@ -308,8 +325,11 @@ int jge_func(Cpu *cpu, char **operand)
 	switch (operand_len(operand)) {
 		case 1:
 			if ((cpu->alu.eq) || !(cpu->alu.neg)) {
-				jump_to = atoi(operand[0]);
-				if (jump_to > cpu->pc || 0 < jump_to) {
+				LabelEntry *label_entry = shgetp_null(cpu->process->labels, operand[0]);
+				if (!label_entry) { segmentation_fault_error("Invalid jump statement"); }
+				jump_to = label_entry->value;
+
+				if (jump_to >= cpu->process->instruction_len || 0 > jump_to) {
 					segmentation_fault_error("Invalid jump statement");
 				}
 			}
@@ -322,7 +342,7 @@ int jge_func(Cpu *cpu, char **operand)
 
 int cmp_func(Cpu *cpu, char **operand)
 {
-	bool first, second;
+	int first, second;
 	bool eq = false, neg = false;
 	switch (operand_len(operand)) {
 		case 1:
@@ -351,7 +371,8 @@ int call_func(Cpu *cpu, char **operand)
 			fprintf(stdout, "[%s]: %d\n", "AC", cpu->ac);
 			break;
 		case 1:
-			fprintf(stdout, "[%s]: %d\n", operand[0], cpu_get_value_from_mem_or_reg(cpu, operand[0]));
+			fprintf(
+			    stdout, "[%s]: %d\n", operand[0], cpu_get_value_from_mem_or_reg(cpu, operand[0]));
 			break;
 		default:
 			invalid_instruction_error(cpu->ir);

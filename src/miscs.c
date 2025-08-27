@@ -70,7 +70,7 @@ void invalid_instruction_error(char **instruction)
 
 void segmentation_fault_error(const char *error_msg)
 {
-	fprintf(stderr, "Segmentation fault occured (invalid instruction): %s\n", error_msg);
+	fprintf(stderr, "Segmentation fault occured when executing your assembly: %s\n", error_msg);
 	shutdown(-1);
 }
 

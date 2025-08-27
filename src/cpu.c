@@ -181,7 +181,7 @@ void cpu_destroy(Cpu *cpu)
 		cpu->predictor = NULL;
 	}
 	if (cpu->memory) {
-		for (int i = 0; i < hmlen(cpu->memory); ++i) {
+		for (int i = 0; i < shlen(cpu->memory); ++i) {
 			if (cpu->memory[i].key) { free_and_null(cpu->memory[i].key); }
 			if (cpu->memory[i].value) { free_and_null(cpu->memory[i].value); }
 		}

@@ -14,3 +14,10 @@
 .END:
     PUSH result         ; Push 'result' value onto the stack (preparing for output)
     CALL STK            ; Print the top value of the stack 
+
+; a = 5, b = 10
+; if (a < b) {
+;    result = a + b; // 5 + 10 = 15
+; } else {
+;    result = a - b;
+; }
