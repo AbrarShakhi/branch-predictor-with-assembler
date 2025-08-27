@@ -8,17 +8,16 @@
 #include "stb_ds.h"
 
 
-char *read_line(FILE *stream) {
+char *read_line(FILE *stream)
+{
 	size_t capacity = 128;
 	size_t length = 0;
 	char *buffer = malloc(capacity);
-	if (!buffer)
-		return NULL;
+	if (!buffer) return NULL;
 
 	int c;
 	while ((c = fgetc(stream)) != EOF) {
-		if (c == '\n')
-			break;
+		if (c == '\n') break;
 		buffer[length++] = (char)c;
 		if (length + 1 >= capacity) {
 			capacity *= 2;
@@ -40,11 +39,10 @@ char *read_line(FILE *stream) {
 	return buffer;
 }
 
-char **read_assembly(const char *file) {
+char **read_assembly(const char *file)
+{
 	FILE *in = fopen(file, "r");
-	if (!in) {
-		could_not_open_file(file);
-	}
+	if (!in) { could_not_open_file(file); }
 
 	char **lines = NULL;
 	char *line;

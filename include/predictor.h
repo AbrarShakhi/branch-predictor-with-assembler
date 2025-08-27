@@ -3,19 +3,18 @@
 
 #include <stdbool.h>
 
-
 typedef struct Saturated4BitCounter {
-	int counter;
+  int counter;
 } Saturated4BitCounter;
 
 typedef struct {
-	int key;
-	Saturated4BitCounter *value;
+  int key;
+  Saturated4BitCounter *value;
 } CounterEntry;
 
 typedef struct Predictor {
-	CounterEntry *counter_entry;
-	int threshold;
+  CounterEntry *counter_entry;
+  int threshold;
 } Predictor;
 
 Predictor *predictor_create(int);

@@ -4,7 +4,6 @@
 #include <ctype.h>
 #include <stdbool.h>
 
-
 bool is_line_empty_or_whitespace(const char *);
 void trim_whitespace_inplace(char *);
 void remove_trailing_char(char *, char);

@@ -5,13 +5,12 @@
 #include "stb_ds.h"
 
 
-int add_func(Cpu *cpu, char **operand) {
+int add_func(Cpu *cpu, char **operand)
+{
 	int first, second;
 	switch (operand_len(operand)) {
 		case 0:
-			if (arrlen(cpu->stack) < 2) {
-				segmentation_fault_error("Stack underflow");
-			}
+			if (arrlen(cpu->stack) < 2) { segmentation_fault_error("Stack underflow"); }
 			first = arrpop(cpu->stack);
 			second = arrpop(cpu->stack);
 			arrpush(cpu->stack, (second + first));
@@ -37,13 +36,12 @@ int add_func(Cpu *cpu, char **operand) {
 	return -1;
 }
 
-int mul_func(Cpu *cpu, char **operand) {
+int mul_func(Cpu *cpu, char **operand)
+{
 	int first, second;
 	switch (operand_len(operand)) {
 		case 0:
-			if (arrlen(cpu->stack) < 2) {
-				segmentation_fault_error("Stack underflow");
-			}
+			if (arrlen(cpu->stack) < 2) { segmentation_fault_error("Stack underflow"); }
 			first = arrpop(cpu->stack);
 			second = arrpop(cpu->stack);
 			arrpush(cpu->stack, (second * first));
@@ -68,13 +66,12 @@ int mul_func(Cpu *cpu, char **operand) {
 	return -1;
 }
 
-int sub_func(Cpu *cpu, char **operand) {
+int sub_func(Cpu *cpu, char **operand)
+{
 	int first, second;
 	switch (operand_len(operand)) {
 		case 0:
-			if (arrlen(cpu->stack) < 2) {
-				segmentation_fault_error("Stack underflow");
-			}
+			if (arrlen(cpu->stack) < 2) { segmentation_fault_error("Stack underflow"); }
 			first = arrpop(cpu->stack);
 			second = arrpop(cpu->stack);
 			arrpush(cpu->stack, (second - first));
@@ -99,13 +96,12 @@ int sub_func(Cpu *cpu, char **operand) {
 	return -1;
 }
 
-int div_func(Cpu *cpu, char **operand) {
+int div_func(Cpu *cpu, char **operand)
+{
 	int first, second;
 	switch (operand_len(operand)) {
 		case 0:
-			if (arrlen(cpu->stack) < 2) {
-				segmentation_fault_error("Stack underflow");
-			}
+			if (arrlen(cpu->stack) < 2) { segmentation_fault_error("Stack underflow"); }
 			first = arrpop(cpu->stack);
 			second = arrpop(cpu->stack);
 			arrpush(cpu->stack, (second / first));
@@ -130,13 +126,12 @@ int div_func(Cpu *cpu, char **operand) {
 	return -1;
 }
 
-int push_func(Cpu *cpu, char **operand) {
+int push_func(Cpu *cpu, char **operand)
+{
 	int value;
 	switch (operand_len(operand)) {
 		case 0:
-			if (arrlen(cpu->stack) < 1) {
-				segmentation_fault_error("Stack underflow");
-			}
+			if (arrlen(cpu->stack) < 1) { segmentation_fault_error("Stack underflow"); }
 			value = cpu->ac;
 			break;
 		case 1:
@@ -149,12 +144,11 @@ int push_func(Cpu *cpu, char **operand) {
 	return -1;
 }
 
-int pop_func(Cpu *cpu, char **operand) {
+int pop_func(Cpu *cpu, char **operand)
+{
 	switch (operand_len(operand)) {
 		case 0:
-			if (arrlen(cpu->stack) < 1) {
-				segmentation_fault_error("Stack underflow");
-			}
+			if (arrlen(cpu->stack) < 1) { segmentation_fault_error("Stack underflow"); }
 			cpu->ac = arrpop(cpu->stack);
 			break;
 		default:
@@ -164,7 +158,8 @@ int pop_func(Cpu *cpu, char **operand) {
 }
 
 
-int stor_func(Cpu *cpu, char **operand) {
+int stor_func(Cpu *cpu, char **operand)
+{
 	int value;
 	switch (operand_len(operand)) {
 		case 1:
@@ -180,7 +175,8 @@ int stor_func(Cpu *cpu, char **operand) {
 	return -1;
 }
 
-int load_func(Cpu *cpu, char **operand) {
+int load_func(Cpu *cpu, char **operand)
+{
 	int value;
 	switch (operand_len(operand)) {
 		case 1:

@@ -6,38 +6,35 @@
 #include "assembler.h"
 #include "predictor.h"
 
-
 typedef struct Cpu Cpu;
 
 typedef struct {
-	char *key;
-	int (*value)(Cpu *, char **);
+  char *key;
+  int (*value)(Cpu *, char **);
 } OpcodeEntry;
 
 typedef struct Process {
-	char ***instructions;
-	LabelEntry *labels;
-	int instruction_len;
+  char ***instructions;
+  LabelEntry *labels;
+  int instruction_len;
 } Process;
 
 typedef struct {
-	char *key;
-	char *value;
+  char *key;
+  char *value;
 } MemoryEntry;
 
-
 typedef struct Cpu {
-	int pc;
-	int mar;
-	char **ir;
-	int ac;
-	OpcodeEntry *opcode_funcmap;
-	int *stack;
-	MemoryEntry *memory;
-	Process *process;
-	Predictor *predictor;
+  int pc;
+  int mar;
+  char **ir;
+  int ac;
+  OpcodeEntry *opcode_funcmap;
+  int *stack;
+  MemoryEntry *memory;
+  Process *process;
+  Predictor *predictor;
 } Cpu;
-
 
 OpcodeEntry *map_opcode_logics();
 int operand_len(char **);

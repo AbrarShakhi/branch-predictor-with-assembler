@@ -12,8 +12,9 @@
 #include "stb_ds.h"
 
 
-OpcodeEntry *map_opcode_logics() {
-	OpcodeEntry *opcode_funcmap = NULL;
+OpcodeEntry* map_opcode_logics()
+{
+	OpcodeEntry* opcode_funcmap = NULL;
 	shdefault(opcode_funcmap, NULL);
 
 	shput(opcode_funcmap, "NOP", NULL);
@@ -30,7 +31,8 @@ OpcodeEntry *map_opcode_logics() {
 	return opcode_funcmap;
 }
 
-int operand_len(char **operand) {
+int operand_len(char** operand)
+{
 	int i = 0;
 	while (operand && operand[i]) {
 		i++;
@@ -39,37 +41,32 @@ int operand_len(char **operand) {
 }
 
 
-Cpu *cpu_create() {
-	Cpu *cpu = (Cpu *)calloc(1, sizeof(Cpu));
-	if (!cpu) {
-		unable_to_allocate_memory_error("cpu");
-	}
+Cpu* cpu_create()
+{
+	Cpu* cpu = (Cpu*)calloc(1, sizeof(Cpu));
+	if (!cpu) { unable_to_allocate_memory_error("cpu"); }
 	cpu->opcode_funcmap = map_opcode_logics();
 	cpu->predictor = predictor_create(8);
 	return cpu;
 }
 
-int cpu_get_value_from_mem_or_reg(Cpu *cpu, char *operand) {
-	if (is_digits_only(operand)) {
-		return atoi(operand);
-	}
-	if (strncmp(operand, "AX", 2)) {
-		return cpu->ac;
-	}
+int cpu_get_value_from_mem_or_reg(Cpu* cpu, char* operand)
+{
+	if (is_digits_only(operand)) { return atoi(operand); }
+	if (strncmp(operand, "AX", 2)) { return cpu->ac; }
 
 	if (surrounded_by_braces(operand, '(')) {
 		remove_leading_char(operand, '(');
 		remove_trailing_char(operand, ')');
 		trim_whitespace_inplace(operand);
 	}
-	MemoryEntry *mem = shgetp_null(cpu->memory, operand);
-	if (!mem) {
-		segmentation_fault_error("Memory access violation: address not found");
-	}
+	MemoryEntry* mem = shgetp_null(cpu->memory, operand);
+	if (!mem) { segmentation_fault_error("Memory access violation: address not found"); }
 	return atoi(mem->value);
 }
 
-void cpu_set_value_to_mem_or_reg(Cpu *cpu, char *operand, int value) {
+void cpu_set_value_to_mem_or_reg(Cpu* cpu, char* operand, int value)
+{
 	if (strncmp(operand, "AC", 2)) {
 		cpu->ac = value;
 		return;
@@ -80,7 +77,7 @@ void cpu_set_value_to_mem_or_reg(Cpu *cpu, char *operand, int value) {
 		remove_trailing_char(operand, ')');
 		trim_whitespace_inplace(operand);
 	}
-	MemoryEntry *mem = shgetp_null(cpu->memory, operand);
+	MemoryEntry* mem = shgetp_null(cpu->memory, operand);
 	if (!mem) {
 		shput(cpu->memory, operand, itoa_dynamic(value));
 		return;
@@ -89,41 +86,40 @@ void cpu_set_value_to_mem_or_reg(Cpu *cpu, char *operand, int value) {
 	mem->value = itoa_dynamic(value);
 }
 
-void cpu_load_process(Cpu *cpu, char ***instructions, LabelEntry *labels) {
+void cpu_load_process(Cpu* cpu, char*** instructions, LabelEntry* labels)
+{
 	cpu->pc = 0;
-	cpu->process = (Process *)malloc(1 * sizeof(Process));
-	if (!cpu->process) {
-		unable_to_allocate_memory_error("cpu");
-	}
+	cpu->process = (Process*)malloc(1 * sizeof(Process));
+	if (!cpu->process) { unable_to_allocate_memory_error("cpu"); }
 	cpu->process->instructions = instructions;
 	cpu->process->labels = labels;
 	cpu->process->instruction_len = arrlen(cpu->process->instructions);
 }
 
-bool __cpu_process_finish(Cpu *cpu) {
+bool __cpu_process_finish(Cpu* cpu)
+{
 	return (cpu->pc >= cpu->process->instruction_len);
 }
 
-char **__cpu_fetch_instruction(Cpu *cpu, int i) {
+char** __cpu_fetch_instruction(Cpu* cpu, int i)
+{
 	return cpu->process->instructions[i];
 }
 
-OpcodeEntry *__cpu_decode_instruction(Cpu *cpu, char **instruction) {
-	char *opcode = instruction[0];
-	OpcodeEntry *opcode_map = shgetp_null(cpu->opcode_funcmap, opcode);
-	if (!opcode_map) {
-		invalid_instruction_error(instruction);
-	}
+OpcodeEntry* __cpu_decode_instruction(Cpu* cpu, char** instruction)
+{
+	char* opcode = instruction[0];
+	OpcodeEntry* opcode_map = shgetp_null(cpu->opcode_funcmap, opcode);
+	if (!opcode_map) { invalid_instruction_error(instruction); }
 	return opcode_map;
 }
 
 
-char **__cpu_fetch_operand(Cpu *cpu) {
+char** __cpu_fetch_operand(Cpu* cpu)
+{
 	int token_len = arrlen(cpu->ir);
-	if (!token_len) {
-		invalid_instruction_error(cpu->ir);
-	}
-	char **operand = NULL;
+	if (!token_len) { invalid_instruction_error(cpu->ir); }
+	char** operand = NULL;
 	for (int i = 1; i < token_len; i++) {
 		arrpush(operand, cpu->ir[i]);
 	}
@@ -131,17 +127,16 @@ char **__cpu_fetch_operand(Cpu *cpu) {
 	return operand;
 }
 
-int __cpu_execute_instruction(Cpu *cpu, OpcodeEntry *opcode_map,
-                              char **operand) {
+int __cpu_execute_instruction(Cpu* cpu, OpcodeEntry* opcode_map, char** operand)
+{
 	int next_instr = -1;
-	if (opcode_map->value) {
-		next_instr = (opcode_map->value)(cpu, operand);
-	}
+	if (opcode_map->value) { next_instr = (opcode_map->value)(cpu, operand); }
 	arrfree(operand);
 	return next_instr;
 }
 
-void cpu_interpret(Cpu *cpu) {
+void cpu_interpret(Cpu* cpu)
+{
 	while (!__cpu_process_finish(cpu)) {
 		cpu->mar = cpu->pc;
 		cpu->pc++;
@@ -150,9 +145,7 @@ void cpu_interpret(Cpu *cpu) {
 		bool predicted_taken = predictor_predict(cpu->predictor, cpu->mar);
 
 		int next_instr = __cpu_execute_instruction(
-		    cpu,
-		    __cpu_decode_instruction(cpu,
-		                             __cpu_fetch_instruction(cpu, cpu->mar)),
+		    cpu, __cpu_decode_instruction(cpu, __cpu_fetch_instruction(cpu, cpu->mar)),
 		    __cpu_fetch_operand(cpu));
 
 		bool actual_taken = (next_instr != -1) && (next_instr != cpu->mar + 1);
@@ -163,18 +156,18 @@ void cpu_interpret(Cpu *cpu) {
 			predictor_unsuccessful_prediction(cpu->predictor, cpu->mar);
 		}
 
-		if (next_instr != -1) {
-			cpu->pc = next_instr;
-		}
+		if (next_instr != -1) { cpu->pc = next_instr; }
 	}
 }
 
-void cpu_print_auc(Cpu *cpu) {
+void cpu_print_auc(Cpu* cpu)
+{
 	printf("accumulator: %d\n", cpu->ac);
 }
 
-void cpu_destroy(Cpu *cpu) {
-	if (!cpu) return;
+void cpu_destroy(Cpu* cpu)
+{
+	if (!cpu) { return; }
 
 	if (cpu->predictor) {
 		predictor_distroy(cpu->predictor);
@@ -182,12 +175,8 @@ void cpu_destroy(Cpu *cpu) {
 	}
 	if (cpu->memory) {
 		for (int i = 0; i < hmlen(cpu->memory); ++i) {
-			if (cpu->memory[i].key) {
-				free_and_null(cpu->memory[i].key);
-			}
-			if (cpu->memory[i].value) {
-				free_and_null(cpu->memory[i].value);
-			}
+			if (cpu->memory[i].key) { free_and_null(cpu->memory[i].key); }
+			if (cpu->memory[i].value) { free_and_null(cpu->memory[i].value); }
 		}
 		hmfree(cpu->memory);
 		cpu->memory = NULL;
@@ -196,9 +185,7 @@ void cpu_destroy(Cpu *cpu) {
 		arrfree(cpu->stack);
 		cpu->stack = NULL;
 	}
-	if (cpu->process) {
-		free_and_null(cpu->process);
-	}
+	if (cpu->process) { free_and_null(cpu->process); }
 	if (cpu->opcode_funcmap) {
 		shfree(cpu->opcode_funcmap);
 		cpu->opcode_funcmap = NULL;

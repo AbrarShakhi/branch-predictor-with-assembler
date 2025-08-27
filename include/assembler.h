@@ -3,19 +3,17 @@
 
 #include "stb_ds.h"
 
-
 typedef struct {
-	char *key;
-	int value;
+  char *key;
+  int value;
 } LabelEntry;
 
 typedef struct Assembler {
-	char **lines;
-	const char *file;
-	char ***instructions;
-	LabelEntry *labels;
+  char **lines;
+  const char *file;
+  char ***instructions;
+  LabelEntry *labels;
 } Assembler;
-
 
 Assembler *assembler_create(const char *);
 

@@ -5,7 +5,8 @@
 #include "miscs.h"
 
 
-char *parse_args(const int argc, char *argv[]) {
+char *parse_args(const int argc, char *argv[])
+{
 	for (int i = 0; i < argc; i++) {
 		if (strncmp(argv[i], "-i", 2) == 0) {
 			if (i + 1 < argc) {
@@ -15,5 +16,5 @@ char *parse_args(const int argc, char *argv[]) {
 			}
 		}
 	}
-	return "/home/abrarshakhi/Desktop/branch-predictor-with-assembler/example/ifelse.s";
+	return NULL;
 }

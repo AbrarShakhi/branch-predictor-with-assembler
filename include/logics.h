@@ -3,7 +3,6 @@
 
 #include "cpu.h"
 
-
 int add_func(Cpu *, char **);
 int mul_func(Cpu *, char **);
 int sub_func(Cpu *, char **);
