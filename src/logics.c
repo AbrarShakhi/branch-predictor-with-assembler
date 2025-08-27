@@ -1,5 +1,6 @@
 #include "logics.h"
 
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "cpu.h"
@@ -226,7 +227,7 @@ int je_func(Cpu *cpu, char **operand)
 		default:
 			invalid_instruction_error(cpu->ir);
 	}
-	return -1;
+	return jump_to;
 }
 
 int jne_func(Cpu *cpu, char **operand)
@@ -244,43 +245,7 @@ int jne_func(Cpu *cpu, char **operand)
 		default:
 			invalid_instruction_error(cpu->ir);
 	}
-	return -1;
-}
-
-int jc_func(Cpu *cpu, char **operand)
-{
-	int jump_to = -1;
-	switch (operand_len(operand)) {
-		case 1:
-			if (cpu->alu.cur) {
-				jump_to = atoi(operand[0]);
-				if (jump_to > cpu->pc || 0 < jump_to) {
-					segmentation_fault_error("Invalid jump statement");
-				}
-			}
-			break;
-		default:
-			invalid_instruction_error(cpu->ir);
-	}
-	return -1;
-}
-
-int jnc_func(Cpu *cpu, char **operand)
-{
-	int jump_to = -1;
-	switch (operand_len(operand)) {
-		case 1:
-			if (!(cpu->alu.cur)) {
-				jump_to = atoi(operand[0]);
-				if (jump_to > cpu->pc || 0 < jump_to) {
-					segmentation_fault_error("Invalid jump statement");
-				}
-			}
-			break;
-		default:
-			invalid_instruction_error(cpu->ir);
-	}
-	return -1;
+	return jump_to;
 }
 
 int jl_func(Cpu *cpu, char **operand)
@@ -298,7 +263,7 @@ int jl_func(Cpu *cpu, char **operand)
 		default:
 			invalid_instruction_error(cpu->ir);
 	}
-	return -1;
+	return jump_to;
 }
 
 int jle_func(Cpu *cpu, char **operand)
@@ -316,7 +281,7 @@ int jle_func(Cpu *cpu, char **operand)
 		default:
 			invalid_instruction_error(cpu->ir);
 	}
-	return -1;
+	return jump_to;
 }
 
 int jg_func(Cpu *cpu, char **operand)
@@ -334,7 +299,7 @@ int jg_func(Cpu *cpu, char **operand)
 		default:
 			invalid_instruction_error(cpu->ir);
 	}
-	return -1;
+	return jump_to;
 }
 
 int jge_func(Cpu *cpu, char **operand)
@@ -348,6 +313,45 @@ int jge_func(Cpu *cpu, char **operand)
 					segmentation_fault_error("Invalid jump statement");
 				}
 			}
+			break;
+		default:
+			invalid_instruction_error(cpu->ir);
+	}
+	return jump_to;
+}
+
+int cmp_func(Cpu *cpu, char **operand)
+{
+	bool first, second;
+	bool eq = false, neg = false;
+	switch (operand_len(operand)) {
+		case 1:
+			first = cpu_get_value_from_mem_or_reg(cpu, operand[0]);
+			eq = (cpu->ac - first) == 0;
+			neg = (cpu->ac - first) < 0;
+			break;
+		case 2:
+			first = cpu_get_value_from_mem_or_reg(cpu, operand[0]);
+			second = cpu_get_value_from_mem_or_reg(cpu, operand[1]);
+			eq = (first - second) == 0;
+			neg = (first - second) < 0;
+			break;
+		default:
+			invalid_instruction_error(cpu->ir);
+	}
+	cpu->alu.eq = eq;
+	cpu->alu.neg = neg;
+	return -1;
+}
+
+int call_func(Cpu *cpu, char **operand)
+{
+	switch (operand_len(operand)) {
+		case 0:
+			fprintf(stdout, "[%s]: %d\n", "AC", cpu->ac);
+			break;
+		case 1:
+			fprintf(stdout, "[%s]: %d\n", operand[0], cpu_get_value_from_mem_or_reg(cpu, operand[0]));
 			break;
 		default:
 			invalid_instruction_error(cpu->ir);

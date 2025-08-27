@@ -11,7 +11,7 @@
 #include "stb_ds.h"
 
 
-Assembler *assembler_create(const char *file)
+Assembler *assembler_create(char *file)
 {
 	Assembler *assembler = (Assembler *)calloc(1, sizeof(Assembler));
 	if (!assembler) { unable_to_allocate_memory_error("assembler"); }
@@ -25,9 +25,14 @@ void assembler_parse(Assembler *assembler)
 	assembler->lines = read_assembly(assembler->file);
 }
 
-char **preprocess(char *line)
+char **__preprocess(char *line)
 {
-	if (is_line_empty_or_whitespace(line)) { NULL; }
+	if (is_line_empty_or_whitespace(line)) { return NULL; }
+	
+	char *comment_start = strchr(line, ';');
+	if (comment_start != NULL) { *comment_start = '\0'; }
+	
+	if (is_line_empty_or_whitespace(line)) { return NULL; }
 	trim_whitespace_inplace(line);
 
 	char **tokens = NULL;
@@ -57,7 +62,7 @@ void assembler_tokenize(Assembler *assembler)
 		char *line = assembler->lines[i];
 		to_upper(&line);
 
-		char **tokens = preprocess(line);
+		char **tokens = __preprocess(line);
 		if (!tokens) { continue; }
 
 		if (is_label(tokens)) {
@@ -80,6 +85,7 @@ void assembler_destroy(Assembler *assembler)
 		}
 		arrfree(assembler->instructions);
 	}
+	if (assembler->file) free_and_null(assembler->file);
 	if (assembler->labels) { shfree(assembler->labels); }
 	if (assembler->lines) {
 		for (int i = 0; i < arrlen(assembler->lines); i++) {

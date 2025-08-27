@@ -23,11 +23,18 @@ void shutdown(int status)
 	exit(status);
 }
 
-void missing_filename_error()
+void missing_filename_error(const char *programname)
 {
 	fprintf(stderr, "File name required!\n");
 	fprintf(stderr, "Use Case:\n");
-	fprintf(stderr, "\t[myprogram] -i [assembly.s]\n");
+	fprintf(stderr, "\t%s [your assembly file]\n\n", programname);
+	fprintf(stderr, "Example:\n");
+	fprintf(stderr, "\t%s asmbly.s\n\n", programname);
+
+	fprintf(stderr, "If you unsure what assembly code to pass use our own defined\n");
+	fprintf(stderr, "\t%s -e %s\n\n", programname, "ifelse.s");
+	fprintf(stderr, "you can use other assembly located in example directory.\n");
+
 	shutdown(-1);
 }
 

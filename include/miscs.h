@@ -3,7 +3,7 @@
 
 void clean_up();
 void shutdown(int);
-void missing_filename_error();
+void missing_filename_error(const char *);
 void free_and_null(void *ptr);
 void unable_to_allocate_memory_error(const char *);
 void unrecognized_assembly_syntax_error(const char *, int);

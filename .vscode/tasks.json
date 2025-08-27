@@ -8,7 +8,7 @@
         "-fdiagnostics-color=always",
         "-Wall",
         "-Wextra",
-        "-std=c11",
+        "-std=gnu17",
         "-I${workspaceFolder}/include",
         "-g",
         "${workspaceFolder}/src/**.c",

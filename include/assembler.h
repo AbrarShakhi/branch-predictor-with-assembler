@@ -10,12 +10,12 @@ typedef struct {
 
 typedef struct Assembler {
   char **lines;
-  const char *file;
+  char *file;
   char ***instructions;
   LabelEntry *labels;
 } Assembler;
 
-Assembler *assembler_create(const char *);
+Assembler *assembler_create(char *);
 
 void assembler_parse(Assembler *assembler);
 

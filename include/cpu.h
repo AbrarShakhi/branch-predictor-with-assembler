@@ -26,9 +26,7 @@ typedef struct {
 
 typedef struct Alu {
   bool eq;
-  bool cur;
   bool neg;
-  bool ovrfl;
 } Alu;
 
 typedef struct Cpu {
@@ -52,7 +50,6 @@ int cpu_get_value_from_mem_or_reg(Cpu *, char *);
 void cpu_set_value_to_mem_or_reg(Cpu *, char *, int);
 void cpu_load_process(Cpu *, char ***, LabelEntry *);
 void cpu_interpret(Cpu *);
-void cpu_print_auc(Cpu *);
 void cpu_destroy(Cpu *);
 
 #endif

@@ -1,7 +1,6 @@
 #include "cpu.h"
 
 #include <stdbool.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -26,16 +25,17 @@ OpcodeEntry *map_opcode_logics()
 	shput(opcode_funcmap, "PUSH", push_func);
 	shput(opcode_funcmap, "POP", pop_func);
 
+	shput(opcode_funcmap, "CMP", cmp_func);
+
 	shput(opcode_funcmap, "JMP", jmp_func); // Un-conditional branch
 	shput(opcode_funcmap, "JE", je_func);   // Branch if eluals to
 	shput(opcode_funcmap, "JNE", jne_func); // Branch if not eluals to
-	shput(opcode_funcmap, "JC", jc_func);   // Branch if carry
-	shput(opcode_funcmap, "JNC", jnc_func); // Branch if carry not zero
 	shput(opcode_funcmap, "JL", jl_func);   // Branch if less than
 	shput(opcode_funcmap, "JLE", jle_func); // Branch if less than or eaual
 	shput(opcode_funcmap, "JG", jg_func);   // Branch if greater than
 	shput(opcode_funcmap, "JGE", jge_func); // Branch if greater than or equal
 
+	shput(opcode_funcmap, "CALL", call_func);
 	return opcode_funcmap;
 }
 
@@ -60,7 +60,13 @@ Cpu *cpu_create()
 int cpu_get_value_from_mem_or_reg(Cpu *cpu, char *operand)
 {
 	if (is_digits_only(operand)) { return atoi(operand); }
-	if (strncmp(operand, "AX", 2)) { return cpu->ac; }
+	if (strncmp(operand, "AX", 2) == 0) { return cpu->ac; }
+
+	if (strncmp(operand, "STK", 2) == 0) {
+		if (!arrlen(cpu->stack)) { segmentation_fault_error("Stack Underflow."); }
+		int value = (cpu->stack)[arrlen(cpu->stack) - 1];
+		return value;
+	}
 
 	if (surrounded_by_braces(operand, '(')) {
 		remove_leading_char(operand, '(');
@@ -74,7 +80,7 @@ int cpu_get_value_from_mem_or_reg(Cpu *cpu, char *operand)
 
 void cpu_set_value_to_mem_or_reg(Cpu *cpu, char *operand, int value)
 {
-	if (strncmp(operand, "AC", 2)) {
+	if (strncmp(operand, "AC", 2) == 0) {
 		cpu->ac = value;
 		return;
 	}
@@ -164,11 +170,6 @@ void cpu_interpret(Cpu *cpu)
 
 		if (next_instr != -1) { cpu->pc = next_instr; }
 	}
-}
-
-void cpu_print_auc(Cpu *cpu)
-{
-	printf("accumulator: %d\n", cpu->ac);
 }
 
 void cpu_destroy(Cpu *cpu)
