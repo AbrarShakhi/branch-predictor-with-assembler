@@ -10,6 +10,7 @@
 #include "predictor.h"
 #include "stb_ds.h"
 
+
 OpcodeEntry *map_opcode_logics()
 {
 	OpcodeEntry *opcode_funcmap = NULL;

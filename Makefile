@@ -1,6 +1,11 @@
 # Compiler and flags
 CC := gcc
-CFLAGS := -Wall -Wextra -std=gnu17 -Iinclude
+
+DEBUG_FLAGS := -Wall -Wextra -std=gnu17 -Iinclude -g
+RELEASE_FLAGS := -Wall -Wextra -std=gnu17 -Iinclude -O3 -DNDEBUG
+
+# By default, use debug flags
+CFLAGS := $(DEBUG_FLAGS)
 
 # Directories
 SRC_DIR := src
@@ -24,8 +29,12 @@ endif
 SRCS := $(wildcard $(SRC_DIR)/*.c)
 OBJS := $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.o, $(SRCS))
 
-# Default target
+# Default target: debug build
 all: $(BIN)
+
+# Release target: optimized build
+release: CFLAGS := $(RELEASE_FLAGS)
+release: clean $(BIN)
 
 # Link object files into final executable
 $(BIN): $(OBJS)
@@ -44,4 +53,5 @@ clean:
 	rm -rf $(OBJ_DIR) $(BIN)
 
 # Phony targets
-.PHONY: all clean
+.PHONY: all clean release
+

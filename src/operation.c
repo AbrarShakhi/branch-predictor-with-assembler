@@ -136,14 +136,15 @@ int push_func(Cpu *cpu, char **operand)
 		case 0:
 			if (arrlen(cpu->stack) < 1) { segmentation_fault_error("Stack underflow"); }
 			value = cpu->ac;
+			arrpush(cpu->stack, value);
 			break;
 		case 1:
 			value = cpu_get_value_from_mem_or_reg(cpu, operand[0]);
+			arrpush(cpu->stack, value);
 			break;
 		default:
 			invalid_instruction_error(cpu->ir);
 	}
-	arrpush(cpu->stack, value);
 	return -1;
 }
 

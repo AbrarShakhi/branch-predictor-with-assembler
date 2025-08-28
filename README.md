@@ -1,55 +1,83 @@
-# branch-predictor-with-assembler
+# Branch Predictor with Assembler
 
-This project implements a simple CPU simulation with instruction execution and branch prediction using a 4-bit saturating counter predictor.
+A C-based simulator for branch prediction and assembly code execution. This project provides a simple assembler and CPU simulator to test branch prediction algorithms using custom assembly code.
 
 ## Features
 
-- Basic Assembler.
-- Basic CPU instruction fetch, decode, and execute cycle.
-- Branch prediction using a saturating 4-bit counter per instruction.
-- Instruction set includes arithmetic, memory, and stack operations.
+- Assembler for a custom instruction set
+- CPU simulation with branch prediction
+- Example assembly programs (see `example/`)
+- Modular codebase for easy extension
 
-## Requirements
+## Directory Structure
 
-- GCC compiler supporting GNU extensions (recommended `gcc` with `-std=gnu17`).
-- `make`
+- `src/` — Source code files
+- `include/` — Header files
+- `obj/` — Compiled object files
+- `example/` — Sample assembly programs
+- `main.out` — Compiled executable
 
 ## Build Instructions
 
-1. Clone or download the project source code.
-2. Navigate to the project root directory.
-3. Run `make` to build the project executable.
 
-The provided Makefile compiles the source files in the `src/` directory and outputs an executable named `main.out` (on Linux/macOS) or `main.exe` (on Windows).
+### Linux
 
-## Running the Project
-
-After building:
+Make sure you have `GCC` or `make` installed. Then run:
 
 ```sh
-./main.out
+make release 
 ```
 
-or on Windows:
+Or manually:
+
+```sh
+gcc -std=gnu17 -Iinclude src/*.c -o main.out
+```
+
+### Windows (MinGW/MSYS)
+
+Open MSYS2 or MinGW terminal. Make sure GCC is installed (`pacman -S mingw-w64-x86_64-gcc` for MSYS2).
+
+```sh
+make release
+```
+
+Or manually:
+
+```sh
+gcc -std=gnu17 -Iinclude src/*.c -o main.exe
+```
+
+### Windows (Command Prompt with GCC)
+
+If you have GCC in your PATH (e.g., via MinGW), run:
 
 ```cmd
-main.exe
+gcc -std=gnu17 -Iinclude src/*.c -o main.exe
 ```
 
-Currently, the program executes a predefined or loaded set of assembly-style instructions in simulation, using its branch predictor to optimize instruction execution paths.
+Or use the VS Code build task (C/C++: gcc build active file).
 
-## Files
+## Usage
 
-- `src/cpu.c` and `src/cpu.h`: CPU implementation including interpreter and instruction execution.
-- `src/predictor.c` and `src/predictor.h`: Branch predictor implementation.
-- `include/stb_ds.h`: Third-party header-only hashmap library used internally.
+Run the simulator with an example assembly file:
 
-## Notes
+```sh
+./main.out example/fibb.s
+```
 
-- The predictor expects a threshold value between 1 and 14 for its counters.
-- Ensure the compiler supports GNU extensions (e.g., `typeof`) for `stb_ds` macros.
-- The Makefile uses `-std=gnu17` for compatibility.
+## Example Programs
 
----
+- `fibb.s` — Fibonacci sequence
+- `ifelse.s` — If-else logic
+- `loop.s` — Loop example
+- `primes.s` — Prime number calculation
 
-This project is a foundation for experimenting with CPU simulation and branch prediction concepts. Contributions and improvements are welcome.
+## Contributing
+
+Feel free to open issues or submit pull requests.
+
+## License
+
+See `LICENSE` for details.
+
