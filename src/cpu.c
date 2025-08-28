@@ -4,8 +4,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "logics.h"
 #include "miscs.h"
+#include "operation.h"
 #include "parse_str.h"
 #include "predictor.h"
 #include "stb_ds.h"
@@ -46,6 +46,11 @@ int operand_len(char **operand)
 		i++;
 	}
 	return i;
+}
+
+bool valid_jump(int dest, int ilen)
+{
+	return dest >= 0 && dest <= ilen;
 }
 
 Cpu *cpu_create()
@@ -160,7 +165,7 @@ void cpu_interpret(Cpu *cpu)
 		    cpu, __cpu_decode_instruction(cpu, __cpu_fetch_instruction(cpu, cpu->mar)),
 		    __cpu_fetch_operand(cpu));
 
-		bool actual_taken = (next_instr != -1) && (next_instr != cpu->mar + 1);
+		bool actual_taken = (next_instr != -1) && (next_instr != cpu->pc);
 
 		if (predicted_taken == actual_taken) {
 			predictor_successful_prediction(cpu->predictor, cpu->mar);

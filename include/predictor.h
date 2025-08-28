@@ -7,7 +7,7 @@ typedef struct Saturated4BitCounter {
   int counter;
 } Saturated4BitCounter;
 
-typedef struct {
+typedef struct CounterEntry{
   int key;
   Saturated4BitCounter *value;
 } CounterEntry;

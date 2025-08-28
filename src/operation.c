@@ -1,8 +1,8 @@
-#include "logics.h"
+#include "operation.h"
 
 #include <stdio.h>
-#include <stdlib.h>
 
+#include "assembler.h"
 #include "cpu.h"
 #include "miscs.h"
 #include "stb_ds.h"
@@ -25,12 +25,12 @@ int add_func(Cpu *cpu, char **operand)
 		case 2:
 			first = cpu_get_value_from_mem_or_reg(cpu, operand[0]);
 			second = cpu_get_value_from_mem_or_reg(cpu, operand[1]);
-			cpu_set_value_to_mem_or_reg(cpu, operand[1], (first + second));
+			cpu_set_value_to_mem_or_reg(cpu, operand[0], (first + second));
 			break;
 		case 3:
-			first = cpu_get_value_from_mem_or_reg(cpu, operand[0]);
-			second = cpu_get_value_from_mem_or_reg(cpu, operand[1]);
-			cpu_set_value_to_mem_or_reg(cpu, operand[2], (first + second));
+			first = cpu_get_value_from_mem_or_reg(cpu, operand[1]);
+			second = cpu_get_value_from_mem_or_reg(cpu, operand[2]);
+			cpu_set_value_to_mem_or_reg(cpu, operand[0], (first + second));
 			break;
 		default:
 			invalid_instruction_error(cpu->ir);
@@ -56,12 +56,12 @@ int mul_func(Cpu *cpu, char **operand)
 		case 2:
 			first = cpu_get_value_from_mem_or_reg(cpu, operand[0]);
 			second = cpu_get_value_from_mem_or_reg(cpu, operand[1]);
-			cpu_set_value_to_mem_or_reg(cpu, operand[1], (first * second));
+			cpu_set_value_to_mem_or_reg(cpu, operand[0], (first * second));
 			break;
 		case 3:
-			first = cpu_get_value_from_mem_or_reg(cpu, operand[0]);
-			second = cpu_get_value_from_mem_or_reg(cpu, operand[1]);
-			cpu_set_value_to_mem_or_reg(cpu, operand[2], (first * second));
+			first = cpu_get_value_from_mem_or_reg(cpu, operand[1]);
+			second = cpu_get_value_from_mem_or_reg(cpu, operand[2]);
+			cpu_set_value_to_mem_or_reg(cpu, operand[0], (first * second));
 			break;
 		default:
 			invalid_instruction_error(cpu->ir);
@@ -86,12 +86,12 @@ int sub_func(Cpu *cpu, char **operand)
 		case 2:
 			first = cpu_get_value_from_mem_or_reg(cpu, operand[0]);
 			second = cpu_get_value_from_mem_or_reg(cpu, operand[1]);
-			cpu_set_value_to_mem_or_reg(cpu, operand[1], (first - second));
+			cpu_set_value_to_mem_or_reg(cpu, operand[0], (first - second));
 			break;
 		case 3:
-			first = cpu_get_value_from_mem_or_reg(cpu, operand[0]);
-			second = cpu_get_value_from_mem_or_reg(cpu, operand[1]);
-			cpu_set_value_to_mem_or_reg(cpu, operand[2], (first - second));
+			first = cpu_get_value_from_mem_or_reg(cpu, operand[1]);
+			second = cpu_get_value_from_mem_or_reg(cpu, operand[2]);
+			cpu_set_value_to_mem_or_reg(cpu, operand[0], (first - second));
 			break;
 		default:
 			invalid_instruction_error(cpu->ir);
@@ -116,12 +116,12 @@ int div_func(Cpu *cpu, char **operand)
 		case 2:
 			first = cpu_get_value_from_mem_or_reg(cpu, operand[0]);
 			second = cpu_get_value_from_mem_or_reg(cpu, operand[1]);
-			cpu_set_value_to_mem_or_reg(cpu, operand[1], (first / second));
+			cpu_set_value_to_mem_or_reg(cpu, operand[0], (first / second));
 			break;
 		case 3:
-			first = cpu_get_value_from_mem_or_reg(cpu, operand[0]);
-			second = cpu_get_value_from_mem_or_reg(cpu, operand[1]);
-			cpu_set_value_to_mem_or_reg(cpu, operand[2], (first / second));
+			first = cpu_get_value_from_mem_or_reg(cpu, operand[1]);
+			second = cpu_get_value_from_mem_or_reg(cpu, operand[2]);
+			cpu_set_value_to_mem_or_reg(cpu, operand[0], (first / second));
 			break;
 		default:
 			invalid_instruction_error(cpu->ir);
@@ -199,12 +199,13 @@ int load_func(Cpu *cpu, char **operand)
 int jmp_func(Cpu *cpu, char **operand)
 {
 	int jump_to = -1;
+	LabelEntry *label_entry;
 	switch (operand_len(operand)) {
 		case 1:
-			LabelEntry *label_entry = shgetp_null(cpu->process->labels, operand[0]);
+			label_entry = shgetp_null(cpu->process->labels, operand[0]);
 			if (!label_entry) { segmentation_fault_error("Invalid jump statement"); }
 			jump_to = label_entry->value;
-			if (jump_to >= cpu->process->instruction_len || 0 > jump_to) {
+			if (!valid_jump(jump_to, cpu->process->instruction_len)) {
 				segmentation_fault_error("Invalid jump statement");
 			}
 			break;
@@ -217,14 +218,15 @@ int jmp_func(Cpu *cpu, char **operand)
 int je_func(Cpu *cpu, char **operand)
 {
 	int jump_to = -1;
+	LabelEntry *label_entry;
 	switch (operand_len(operand)) {
 		case 1:
 			if (cpu->alu.eq) {
-				LabelEntry *label_entry = shgetp_null(cpu->process->labels, operand[0]);
+				label_entry = shgetp_null(cpu->process->labels, operand[0]);
 				if (!label_entry) { segmentation_fault_error("Invalid jump statement"); }
 				jump_to = label_entry->value;
 
-				if (jump_to >= cpu->process->instruction_len || 0 > jump_to) {
+				if (!valid_jump(jump_to, cpu->process->instruction_len)) {
 					segmentation_fault_error("Invalid jump statement");
 				}
 			}
@@ -238,14 +240,15 @@ int je_func(Cpu *cpu, char **operand)
 int jne_func(Cpu *cpu, char **operand)
 {
 	int jump_to = -1;
+	LabelEntry *label_entry;
 	switch (operand_len(operand)) {
 		case 1:
 			if (!(cpu->alu.eq)) {
-				LabelEntry *label_entry = shgetp_null(cpu->process->labels, operand[0]);
+				label_entry = shgetp_null(cpu->process->labels, operand[0]);
 				if (!label_entry) { segmentation_fault_error("Invalid jump statement"); }
 				jump_to = label_entry->value;
 
-				if (jump_to >= cpu->process->instruction_len || 0 > jump_to) {
+				if (!valid_jump(jump_to, cpu->process->instruction_len)) {
 					segmentation_fault_error("Invalid jump statement");
 				}
 			}
@@ -259,14 +262,15 @@ int jne_func(Cpu *cpu, char **operand)
 int jl_func(Cpu *cpu, char **operand)
 {
 	int jump_to = -1;
+	LabelEntry *label_entry;
 	switch (operand_len(operand)) {
 		case 1:
 			if (!(cpu->alu.eq) && (cpu->alu.neg)) {
-				LabelEntry *label_entry = shgetp_null(cpu->process->labels, operand[0]);
+				label_entry = shgetp_null(cpu->process->labels, operand[0]);
 				if (!label_entry) { segmentation_fault_error("Invalid jump statement"); }
 				jump_to = label_entry->value;
 
-				if (jump_to >= cpu->process->instruction_len || 0 > jump_to) {
+				if (!valid_jump(jump_to, cpu->process->instruction_len)) {
 					segmentation_fault_error("Invalid jump statement");
 				}
 			}
@@ -280,14 +284,15 @@ int jl_func(Cpu *cpu, char **operand)
 int jle_func(Cpu *cpu, char **operand)
 {
 	int jump_to = -1;
+	LabelEntry *label_entry;
 	switch (operand_len(operand)) {
 		case 1:
 			if ((cpu->alu.eq) || (cpu->alu.neg)) {
-				LabelEntry *label_entry = shgetp_null(cpu->process->labels, operand[0]);
+				label_entry = shgetp_null(cpu->process->labels, operand[0]);
 				if (!label_entry) { segmentation_fault_error("Invalid jump statement"); }
 				jump_to = label_entry->value;
 
-				if (jump_to >= cpu->process->instruction_len || 0 > jump_to) {
+				if (!valid_jump(jump_to, cpu->process->instruction_len)) {
 					segmentation_fault_error("Invalid jump statement");
 				}
 			}
@@ -301,14 +306,15 @@ int jle_func(Cpu *cpu, char **operand)
 int jg_func(Cpu *cpu, char **operand)
 {
 	int jump_to = -1;
+	LabelEntry *label_entry;
 	switch (operand_len(operand)) {
 		case 1:
 			if (!(cpu->alu.eq) && !(cpu->alu.neg)) {
-				LabelEntry *label_entry = shgetp_null(cpu->process->labels, operand[0]);
+				label_entry = shgetp_null(cpu->process->labels, operand[0]);
 				if (!label_entry) { segmentation_fault_error("Invalid jump statement"); }
 				jump_to = label_entry->value;
 
-				if (jump_to >= cpu->process->instruction_len || 0 > jump_to) {
+				if (!valid_jump(jump_to, cpu->process->instruction_len)) {
 					segmentation_fault_error("Invalid jump statement");
 				}
 			}
@@ -322,14 +328,15 @@ int jg_func(Cpu *cpu, char **operand)
 int jge_func(Cpu *cpu, char **operand)
 {
 	int jump_to = -1;
+	LabelEntry *label_entry;
 	switch (operand_len(operand)) {
 		case 1:
 			if ((cpu->alu.eq) || !(cpu->alu.neg)) {
-				LabelEntry *label_entry = shgetp_null(cpu->process->labels, operand[0]);
+				label_entry = shgetp_null(cpu->process->labels, operand[0]);
 				if (!label_entry) { segmentation_fault_error("Invalid jump statement"); }
 				jump_to = label_entry->value;
 
-				if (jump_to >= cpu->process->instruction_len || 0 > jump_to) {
+				if (!valid_jump(jump_to, cpu->process->instruction_len)) {
 					segmentation_fault_error("Invalid jump statement");
 				}
 			}

@@ -10,7 +10,8 @@
 Assembler *assembler;
 Cpu *cpu;
 
-int main(const int argc, char *argv[]) {
+int main(const int argc, char *argv[])
+{
 	char *input_file = parse_args(argc, argv);
 	if (!input_file) { missing_filename_error(*argv); }
 

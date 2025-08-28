@@ -8,7 +8,7 @@
 
 typedef struct Cpu Cpu;
 
-typedef struct {
+typedef struct OpcodeEntry{
   char *key;
   int (*value)(Cpu *, char **);
 } OpcodeEntry;
@@ -19,7 +19,7 @@ typedef struct Process {
   int instruction_len;
 } Process;
 
-typedef struct {
+typedef struct MemoryEntry{
   char *key;
   char *value;
 } MemoryEntry;
@@ -43,6 +43,7 @@ typedef struct Cpu {
 } Cpu;
 
 OpcodeEntry *map_opcode_logics();
+bool valid_jump(int, int);
 int operand_len(char **);
 
 Cpu *cpu_create();

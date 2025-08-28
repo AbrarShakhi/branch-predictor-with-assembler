@@ -67,7 +67,6 @@ void assembler_tokenize(Assembler *assembler)
 
 		if (is_label(tokens)) {
 			remove_trailing_char(tokens[0], ':');
-			remove_leading_char(tokens[0], '.');
 			shput(assembler->labels, tokens[0], instruction_id);
 		} else if (!starts_with(tokens[0], '.')) {
 			arrpush(assembler->instructions, tokens);

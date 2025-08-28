@@ -3,7 +3,7 @@
 
 #include "stb_ds.h"
 
-typedef struct {
+typedef struct LabelEntry{
   char *key;
   int value;
 } LabelEntry;
