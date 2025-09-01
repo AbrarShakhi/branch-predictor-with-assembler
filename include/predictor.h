@@ -20,9 +20,9 @@ typedef struct Predictor {
 Predictor *predictor_create(int);
 
 bool predictor_predict(Predictor *, int);
-void predictor_successful_prediction(Predictor *, int);
-void predictor_unsuccessful_prediction(Predictor *, int);
+void predictor_learn_to_take(Predictor *, int);
+void predictor_learn_not_to_take(Predictor *, int);
 
-void predictor_distroy(Predictor *);
+void predictor_destroy(Predictor *);
 
 #endif

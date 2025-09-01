@@ -374,16 +374,19 @@ int cmp_func(Cpu *cpu, char **operand)
 
 int call_func(Cpu *cpu, char **operand)
 {
+	fprintf(stdout, "==================PRINT==================\n");
 	switch (operand_len(operand)) {
 		case 0:
-			fprintf(stdout, "[%s]: %d\n", "AC", cpu->ac);
+			fprintf(stdout, CYAN "[" YELLOW "%s" CYAN "]: " GREEN "%d\n" RESET, "AC", cpu->ac);
 			break;
 		case 1:
 			fprintf(
-			    stdout, "[%s]: %d\n", operand[0], cpu_get_value_from_mem_or_reg(cpu, operand[0]));
+			    stdout, CYAN "[" YELLOW "%s" CYAN "]: " GREEN "%d\n" RESET, operand[0],
+			    cpu_get_value_from_mem_or_reg(cpu, operand[0]));
 			break;
 		default:
 			invalid_instruction_error(cpu->ir);
 	}
+	fprintf(stdout, "=========================================\n");
 	return -1;
 }

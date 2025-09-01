@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "miscs.h"
 #include "operation.h"
@@ -25,17 +26,14 @@ OpcodeEntry *map_opcode_logics()
 	shput(opcode_funcmap, "LOAD", load_func);
 	shput(opcode_funcmap, "PUSH", push_func);
 	shput(opcode_funcmap, "POP", pop_func);
-
 	shput(opcode_funcmap, "CMP", cmp_func);
-
-	shput(opcode_funcmap, "JMP", jmp_func); // Un-conditional branch
-	shput(opcode_funcmap, "JE", je_func);   // Branch if eluals to
-	shput(opcode_funcmap, "JNE", jne_func); // Branch if not eluals to
-	shput(opcode_funcmap, "JL", jl_func);   // Branch if less than
-	shput(opcode_funcmap, "JLE", jle_func); // Branch if less than or eaual
-	shput(opcode_funcmap, "JG", jg_func);   // Branch if greater than
-	shput(opcode_funcmap, "JGE", jge_func); // Branch if greater than or equal
-
+	shput(opcode_funcmap, "JMP", jmp_func);
+	shput(opcode_funcmap, "JE", je_func);
+	shput(opcode_funcmap, "JNE", jne_func);
+	shput(opcode_funcmap, "JL", jl_func);
+	shput(opcode_funcmap, "JLE", jle_func);
+	shput(opcode_funcmap, "JG", jg_func);
+	shput(opcode_funcmap, "JGE", jge_func);
 	shput(opcode_funcmap, "CALL", call_func);
 	return opcode_funcmap;
 }
@@ -125,11 +123,12 @@ char **__cpu_fetch_instruction(Cpu *cpu, int i)
 	return cpu->process->instructions[i];
 }
 
-OpcodeEntry *__cpu_decode_instruction(Cpu *cpu, char **instruction)
+OpcodeEntry *__cpu_decode_instruction(Cpu *cpu, char **instruction, bool *is_jump)
 {
 	char *opcode = instruction[0];
 	OpcodeEntry *opcode_map = shgetp_null(cpu->opcode_funcmap, opcode);
 	if (!opcode_map) { invalid_instruction_error(instruction); }
+	if (*opcode == 'J') { *is_jump = true; }
 	return opcode_map;
 }
 
@@ -153,6 +152,52 @@ int __cpu_execute_instruction(Cpu *cpu, OpcodeEntry *opcode_map, char **operand)
 	return next_instr;
 }
 
+void print_cpu_debug_state(Cpu *cpu, Predictor *predictor, bool predicted_taken, bool actual_taken)
+{
+	fprintf(stdout, MAGENTA BOLD "=== CPU STATE ===" RESET "\n");
+	fprintf(
+	    stdout,
+	    CYAN "PC: " RESET GREEN "%d" RESET "  " CYAN "MAR: " RESET GREEN "%d" RESET "  " CYAN
+	         "IR: " RESET YELLOW "\"",
+	    cpu->pc, cpu->mar);
+
+	for (int i = 0; i < arrlen(cpu->ir); i++) {
+		fprintf(stdout, "%s", cpu->ir[i]);
+		if (i < arrlen(cpu->ir) - 1) { fprintf(stdout, " "); }
+	}
+	fprintf(stdout, "\"" RESET "\n");
+
+	fprintf(
+	    stdout,
+	    CYAN "ALU EG: " RESET GREEN "%d" RESET "  " CYAN "ALU NEG: " RESET GREEN "%d" RESET "\n",
+	    cpu->alu.eq, cpu->alu.neg);
+
+	fprintf(
+	    stdout, BLUE "Predicted: " RESET "%s" RESET "  ",
+	    predicted_taken ? GREEN "TAKEN" : RED "NOT TAKEN");
+
+	fprintf(
+	    stdout, BLUE "Actual: " RESET "%s" RESET, actual_taken ? GREEN "TAKEN" : RED "NOT TAKEN");
+
+	if (predicted_taken == actual_taken) {
+		fprintf(stdout, "  " GREEN BOLD "✓ CORRECT" RESET "\n");
+	} else {
+		fprintf(stdout, "  " RED BOLD "✗ WRONG" RESET "\n");
+	}
+
+	CounterEntry *entry = hmgetp_null((predictor->counter_entry), cpu->mar);
+	if (entry && entry->value) {
+		fprintf(
+		    stdout, YELLOW "Predictor Counter [instr %d]: " RESET CYAN "%d\n" RESET, cpu->mar,
+		    entry->value->counter);
+	} else {
+		fprintf(stdout, YELLOW "Predictor Counter [instr %d]: " RESET RED "N/A\n" RESET, cpu->mar);
+	}
+
+	fprintf(stdout, WHITE DIM "────────────────────────────────────────\n" RESET);
+}
+
+
 void cpu_interpret(Cpu *cpu)
 {
 	while (!__cpu_process_finish(cpu)) {
@@ -161,20 +206,31 @@ void cpu_interpret(Cpu *cpu)
 		cpu->ir = cpu->process->instructions[cpu->mar];
 
 		bool predicted_taken = predictor_predict(cpu->predictor, cpu->mar);
-
+		bool is_jump = false;
 		int next_instr = __cpu_execute_instruction(
-		    cpu, __cpu_decode_instruction(cpu, __cpu_fetch_instruction(cpu, cpu->mar)),
-		    __cpu_fetch_operand(cpu));
+		    cpu,
+			__cpu_decode_instruction(
+				cpu,
+				__cpu_fetch_instruction(cpu, cpu->mar),
+				&is_jump),
+		    __cpu_fetch_operand(cpu)
+		);
 
 		bool actual_taken = (next_instr != -1) && (next_instr != cpu->pc);
 
-		if (predicted_taken == actual_taken) {
-			predictor_successful_prediction(cpu->predictor, cpu->mar);
-		} else {
-			predictor_unsuccessful_prediction(cpu->predictor, cpu->mar);
+		print_cpu_debug_state(cpu, cpu->predictor, predicted_taken, actual_taken);
+
+		if (is_jump) {
+			if (actual_taken) {
+				predictor_learn_to_take(cpu->predictor, cpu->mar);
+			} else {
+				predictor_learn_not_to_take(cpu->predictor, cpu->mar);
+			}
 		}
 
 		if (next_instr != -1) { cpu->pc = next_instr; }
+
+		my_getch();
 	}
 }
 
@@ -183,7 +239,7 @@ void cpu_destroy(Cpu *cpu)
 	if (!cpu) { return; }
 
 	if (cpu->predictor) {
-		predictor_distroy(cpu->predictor);
+		predictor_destroy(cpu->predictor);
 		cpu->predictor = NULL;
 	}
 	if (cpu->memory) {

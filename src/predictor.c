@@ -31,27 +31,35 @@ bool predictor_predict(Predictor *predictor, int instr)
 	return false;
 }
 
-void predictor_successful_prediction(Predictor *predictor, int instr)
-{
-	CounterEntry *entry = hmgetp_null((predictor->counter_entry), instr);
-	if (entry && entry->value) { (entry->value->counter)++; }
-}
-
-void predictor_unsuccessful_prediction(Predictor *predictor, int instr)
+void predictor_learn_to_take(Predictor *predictor, int instr)
 {
 	CounterEntry *entry = hmgetp_null((predictor->counter_entry), instr);
 	if (entry && entry->value) {
-		(entry->value->counter)--;
+		if (entry->value->counter < 15)
+			entry->value->counter++;
 	} else {
-		Saturated4BitCounter *bitCounter =
-		    (Saturated4BitCounter *)malloc(sizeof(Saturated4BitCounter));
+		Saturated4BitCounter *bitCounter = malloc(sizeof(Saturated4BitCounter));
 		if (!bitCounter) { unable_to_allocate_memory_error("Saturated4BitCounter"); }
-		(bitCounter->counter)--;
-		hmput((predictor->counter_entry), instr, bitCounter);
+		bitCounter->counter = 8;
+		hmput(predictor->counter_entry, instr, bitCounter);
 	}
 }
 
-void predictor_distroy(Predictor *predictor)
+void predictor_learn_not_to_take(Predictor *predictor, int instr)
+{
+	CounterEntry *entry = hmgetp_null((predictor->counter_entry), instr);
+	if (entry && entry->value) {
+		if (entry->value->counter > 0)
+			entry->value->counter--;
+	} else {
+		Saturated4BitCounter *bitCounter = malloc(sizeof(Saturated4BitCounter));
+		if (!bitCounter) { unable_to_allocate_memory_error("Saturated4BitCounter"); }
+		bitCounter->counter = 7;
+		hmput(predictor->counter_entry, instr, bitCounter);
+	}
+}
+
+void predictor_destroy(Predictor *predictor)
 {
 	if (predictor) {
 		for (int i = 0; i < hmlen(predictor->counter_entry); ++i) {
