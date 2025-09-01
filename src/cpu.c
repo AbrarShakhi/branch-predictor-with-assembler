@@ -167,10 +167,11 @@ void print_cpu_debug_state(Cpu *cpu, Predictor *predictor, bool predicted_taken,
 	}
 	fprintf(stdout, "\"" RESET "\n");
 
+
 	fprintf(
-	    stdout,
-	    CYAN "ALU EG: " RESET GREEN "%d" RESET "  " CYAN "ALU NEG: " RESET GREEN "%d" RESET "\n",
-	    cpu->alu.eq, cpu->alu.neg);
+		stdout,
+		CYAN "ALU EG: " RESET GREEN "%d" RESET "  " CYAN "ALU NEG: " RESET GREEN "%d" RESET "  " CYAN "AC: " RESET YELLOW "%d" RESET "\n",
+		cpu->alu.eq, cpu->alu.neg, cpu->ac);
 
 	fprintf(
 	    stdout, BLUE "Predicted: " RESET "%s" RESET "  ",
