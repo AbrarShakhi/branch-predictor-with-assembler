@@ -1,19 +1,18 @@
 #define STB_DS_IMPLEMENTATION
 
-
 #include "args.h"
 #include "assembler.h"
 #include "cpu.h"
 #include "miscs.h"
 
-
 Assembler *assembler;
 Cpu *cpu;
 
-int main(const int argc, char *argv[])
-{
+int main(const int argc, char *argv[]) {
   char *input_file = parse_args(argc, argv);
-  if (!input_file) { missing_filename_error(*argv); }
+  if (!input_file) {
+    missing_filename_error(*argv);
+  }
 
   assembler = assembler_create(input_file);
   assembler_parse(assembler);

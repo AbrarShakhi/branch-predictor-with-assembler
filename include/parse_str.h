@@ -27,7 +27,7 @@ void to_upper(char **str);
  * @param str The string to reverse.
  * @param length The number of characters in the string to reverse.
  */
-static void reverse_str(char *str, int length);
+void reverse_str(char *str, int length);
 
 /**
  * Converts an integer to its string representation.
