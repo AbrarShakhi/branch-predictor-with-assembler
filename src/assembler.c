@@ -13,84 +13,84 @@
 
 Assembler *assembler_create(char *file)
 {
-	Assembler *assembler = (Assembler *)calloc(1, sizeof(Assembler));
-	if (!assembler) { unable_to_allocate_memory_error("assembler"); }
-	assembler->file = file;
-	shdefault(assembler->labels, -1);
-	return assembler;
+  Assembler *assembler = (Assembler *)calloc(1, sizeof(Assembler));
+  if (!assembler) { unable_to_allocate_memory_error("assembler"); }
+  assembler->file = file;
+  shdefault(assembler->labels, -1);
+  return assembler;
 }
 
 void assembler_parse(Assembler *assembler)
 {
-	assembler->lines = read_assembly(assembler->file);
+  assembler->lines = read_assembly(assembler->file);
 }
 
 char **__preprocess(char *line)
 {
-	if (is_line_empty_or_whitespace(line)) { return NULL; }
+  if (is_line_empty_or_whitespace(line)) { return NULL; }
 
-	char *comment_start = strchr(line, ';');
-	if (comment_start != NULL) { *comment_start = '\0'; }
+  char *comment_start = strchr(line, ';');
+  if (comment_start != NULL) { *comment_start = '\0'; }
 
-	if (is_line_empty_or_whitespace(line)) { return NULL; }
-	trim_whitespace_inplace(line);
+  if (is_line_empty_or_whitespace(line)) { return NULL; }
+  trim_whitespace_inplace(line);
 
-	char **tokens = NULL;
-	char *token = strtok(line, " \t");
-	while (token != NULL) {
-		remove_trailing_char(token, ',');
-		arrpush(tokens, token);
-		token = strtok(NULL, " \t");
-	}
+  char **tokens = NULL;
+  char *token = strtok(line, " \t");
+  while (token != NULL) {
+	remove_trailing_char(token, ',');
+	arrpush(tokens, token);
+	token = strtok(NULL, " \t");
+  }
 
-	return tokens;
+  return tokens;
 }
 
 bool is_label(char **tokens)
 {
-	int token_len = arrlen(tokens);
-	if (token_len == 1) { return ends_with(tokens[0], ':'); }
-	return false;
+  int token_len = arrlen(tokens);
+  if (token_len == 1) { return ends_with(tokens[0], ':'); }
+  return false;
 }
 
 void assembler_tokenize(Assembler *assembler)
 {
-	int line_length = arrlen(assembler->lines);
+  int line_length = arrlen(assembler->lines);
 
-	int instruction_id = 0;
-	for (int i = 0; i < line_length; i++) {
-		char *line = assembler->lines[i];
-		to_upper(&line);
+  int instruction_id = 0;
+  for (int i = 0; i < line_length; i++) {
+	char *line = assembler->lines[i];
+	to_upper(&line);
 
-		char **tokens = __preprocess(line);
-		if (!tokens) { continue; }
+	char **tokens = __preprocess(line);
+	if (!tokens) { continue; }
 
-		if (is_label(tokens)) {
-			remove_trailing_char(tokens[0], ':');
-			shput(assembler->labels, tokens[0], instruction_id);
-		} else if (!starts_with(tokens[0], '.')) {
-			arrpush(assembler->instructions, tokens);
-			instruction_id++;
-		}
+	if (is_label(tokens)) {
+	  remove_trailing_char(tokens[0], ':');
+	  shput(assembler->labels, tokens[0], instruction_id);
+	} else if (!starts_with(tokens[0], '.')) {
+	  arrpush(assembler->instructions, tokens);
+	  instruction_id++;
 	}
+  }
 }
 
 void assembler_destroy(Assembler *assembler)
 {
-	if (!assembler) { return; }
-	if (assembler->instructions) {
-		for (int i = 0; i < arrlen(assembler->instructions); i++) {
-			arrfree(assembler->instructions[i]);
-		}
-		arrfree(assembler->instructions);
+  if (!assembler) { return; }
+  if (assembler->instructions) {
+	for (int i = 0; i < arrlen(assembler->instructions); i++) {
+	  arrfree(assembler->instructions[i]);
 	}
-	free_and_null(assembler->file);
-	if (assembler->labels) { shfree(assembler->labels); }
-	if (assembler->lines) {
-		for (int i = 0; i < arrlen(assembler->lines); i++) {
-			free_and_null(assembler->lines[i]);
-		}
-		arrfree(assembler->lines);
+	arrfree(assembler->instructions);
+  }
+  free_and_null(assembler->file);
+  if (assembler->labels) { shfree(assembler->labels); }
+  if (assembler->lines) {
+	for (int i = 0; i < arrlen(assembler->lines); i++) {
+	  free_and_null(assembler->lines[i]);
 	}
-	free_and_null(assembler);
+	arrfree(assembler->lines);
+  }
+  free_and_null(assembler);
 }
