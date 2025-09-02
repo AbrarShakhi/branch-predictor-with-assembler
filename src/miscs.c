@@ -10,12 +10,6 @@
 #ifdef _WIN32
 #include <conio.h>
 #else
-#include <ncurses.h>
-#endif
-
-#ifdef _WIN32
-#include <conio.h>
-#else
 #include <stdio.h>
 #include <termios.h>
 #include <unistd.h>
